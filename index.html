@@ -1,682 +1,311 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pre-Matrícula 2026 - Liceo Bicentenario Politécnico "Cesareo Aguirre Goyenechea"</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+/**
+ * GOOGLE APPS SCRIPT - PRE-MATRÍCULA 2026
+ * Liceo Bicentenario Politécnico "Cesareo Aguirre Goyenechea"
+ * VERSIÓN FINAL - COMPATIBLE CON FORMULARIO HTML
+ */
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
-            min-height: 100vh;
-        }
+// CONFIGURACIÓN
+const SHEET_NAME = 'Matriculas2026';
+const SPREADSHEET_ID = '1_sNkmhxNbsQBmRLoBAhUO7ijK2KSoVVPIYvOeVmWmXw';
 
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-        }
+/**
+ * Función principal que recibe datos del formulario
+ */
+function doPost(e) {
+  try {
+    Logger.log('=== INICIO DE SOLICITUD ===');
+    Logger.log('Tipo de solicitud: POST');
+    
+    let data = {};
+    
+    // MÉTODO 1: Intentar leer como JSON
+    if (e && e.postData && e.postData.contents) {
+      Logger.log('Método 1: Leyendo como JSON');
+      try {
+        data = JSON.parse(e.postData.contents);
+        Logger.log('✅ Datos JSON parseados correctamente');
+      } catch (jsonError) {
+        Logger.log('⚠️ No es JSON válido: ' + jsonError);
+      }
+    }
+    
+    // MÉTODO 2: Leer como parámetros de formulario
+    if (e && e.parameter && Object.keys(data).length === 0) {
+      Logger.log('Método 2: Leyendo como parámetros');
+      data = e.parameter;
+      Logger.log('✅ Datos de parámetros obtenidos');
+    }
+    
+    // MÉTODO 3: Leer parámetros individuales
+    if (e && e.parameters && Object.keys(data).length === 0) {
+      Logger.log('Método 3: Leyendo parámetros individuales');
+      data = {};
+      for (let key in e.parameters) {
+        data[key] = e.parameters[key][0];
+      }
+      Logger.log('✅ Parámetros individuales procesados');
+    }
+    
+    // Verificar que tenemos datos
+    if (Object.keys(data).length === 0) {
+      Logger.log('❌ ERROR: No se recibieron datos');
+      throw new Error('No se recibieron datos del formulario');
+    }
+    
+    Logger.log('📊 Total de campos recibidos: ' + Object.keys(data).length);
+    Logger.log('Muestra de datos: ' + JSON.stringify(data).substring(0, 200));
+    
+    // Obtener la hoja
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    let sheet = ss.getSheetByName(SHEET_NAME);
+    
+    // Crear hoja si no existe
+    if (!sheet) {
+      Logger.log('⚠️ Hoja no existe, creando...');
+      sheet = ss.insertSheet(SHEET_NAME);
+      crearEncabezados(sheet);
+      Logger.log('✅ Hoja creada');
+    }
+    
+    // Crear encabezados si la hoja está vacía
+    if (sheet.getLastRow() === 0) {
+      Logger.log('⚠️ Hoja vacía, creando encabezados...');
+      crearEncabezados(sheet);
+      Logger.log('✅ Encabezados creados');
+    }
+    
+    // Preparar datos en el orden correcto
+    const timestamp = new Date();
+    
+    const rowData = [
+      timestamp,                              // A - Timestamp
+      '',                                     // B - numRegistro (fórmula)
+      data.fechaMatricula || '',              // C
+      data.curso || '',                       // D
+      data.cursoGestionPasada || '',          // E
+      data.especialidad || '',                // F
+      data.apellidoPaterno || '',             // G
+      data.apellidoMaterno || '',             // H
+      data.nombres || '',                     // I
+      data.run || '',                         // J
+      data.sexo || '',                        // K
+      data.fechaNacimiento || '',             // L
+      data.edad || '',                        // M
+      data.lugarNacimiento || '',             // N
+      data.pais || '',                        // O
+      data.nacionalidad || '',                // P
+      data.religion || '',                    // Q
+      data.etnia || '',                       // R
+      data.celularEstudiante || '',           // S
+      data.correoEstudiante || '',            // T
+      data.domicilioEstudiante || '',         // U
+      data.nombreApoderadoTitular || '',      // V
+      data.correoApoderadoTitular || '',      // W
+      data.fonoApoderadoTitular || '',        // X
+      data.nombreApoderadoSuplente || '',     // Y
+      data.correoApoderadoSuplente || '',     // Z
+      data.fonoApoderadoSuplente || '',       // AA
+      data.profesionPadre || '',              // AB
+      data.profesionMadre || '',              // AC
+      data.profesionApoderado || '',          // AD
+      data.personaConQuienVive || '',         // AE
+      data.totalHijos || '',                  // AF
+      data.lugarQueOcupa || '',               // AG
+      data.personasEnCasa || '',              // AH
+      data.tipoDomicilio || '',               // AI
+      data.situacionEconomica || '',          // AJ
+      data.subsidioUnicoFamiliar || '',       // AK
+      data.beneficioJunaeb || '',             // AL
+      data.chileSolidario || '',              // AM
+      data.becaIndigena || '',                // AN
+      data.cuidadosEspeciales || '',          // AO
+      data.medicamentosContraindicados || '', // AP
+      data.atencionSalud || '',               // AQ
+      data.contactoEmergencia || '',          // AR
+      data.telefonoEmergencia || '',          // AS
+      data.procedenciaEscuela || '',          // AT
+      data.cursoRepetido || ''                // AU
+    ];
+    
+    Logger.log('📝 Preparando para agregar fila...');
+    
+    // Agregar fila
+    sheet.appendRow(rowData);
+    const lastRow = sheet.getLastRow();
+    
+    Logger.log('✅ Fila agregada: ' + lastRow);
+    
+    // Agregar fórmula en columna B
+    sheet.getRange(lastRow, 2).setFormula('=SI(A' + lastRow + '="";"";FILA()-1)');
+    
+    // Formatear timestamp
+    sheet.getRange(lastRow, 1).setNumberFormat('dd/mm/yyyy hh:mm:ss');
+    
+    Logger.log('✅ Datos guardados exitosamente en fila: ' + lastRow);
+    Logger.log('=== FIN DE SOLICITUD ===');
+    
+    // Respuesta exitosa
+    return ContentService
+      .createTextOutput(JSON.stringify({
+        status: 'success',
+        message: 'Datos guardados correctamente',
+        row: lastRow,
+        timestamp: timestamp.toISOString()
+      }))
+      .setMimeType(ContentService.MimeType.JSON);
+      
+  } catch (error) {
+    Logger.log('❌ ERROR CRÍTICO: ' + error.toString());
+    Logger.log('Stack trace: ' + error.stack);
+    
+    // Respuesta de error
+    return ContentService
+      .createTextOutput(JSON.stringify({
+        status: 'error',
+        message: error.toString(),
+        details: error.stack
+      }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
 
-        .header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 40px;
-            text-align: center;
-        }
+/**
+ * Función para crear encabezados
+ */
+function crearEncabezados(sheet) {
+  const headers = [
+    'Timestamp',                      // A
+    'numRegistro',                    // B
+    'fechaMatricula',                 // C
+    'curso',                          // D
+    'cursoGestionPasada',             // E
+    'especialidad',                   // F
+    'apellidoPaterno',                // G
+    'apellidoMaterno',                // H
+    'nombres',                        // I
+    'run',                            // J
+    'sexo',                           // K
+    'fechaNacimiento',                // L
+    'edad',                           // M
+    'lugarNacimiento',                // N
+    'pais',                           // O
+    'nacionalidad',                   // P
+    'religion',                       // Q
+    'etnia',                          // R
+    'celularEstudiante',              // S
+    'correoEstudiante',               // T
+    'domicilioEstudiante',            // U
+    'nombreApoderadoTitular',         // V
+    'correoApoderadoTitular',         // W
+    'fonoApoderadoTitular',           // X
+    'nombreApoderadoSuplente',        // Y
+    'correoApoderadoSuplente',        // Z
+    'fonoApoderadoSuplente',          // AA
+    'profesionPadre',                 // AB
+    'profesionMadre',                 // AC
+    'profesionApoderado',             // AD
+    'personaConQuienVive',            // AE
+    'totalHijos',                     // AF
+    'lugarQueOcupa',                  // AG
+    'personasEnCasa',                 // AH
+    'tipoDomicilio',                  // AI
+    'situacionEconomica',             // AJ
+    'subsidioUnicoFamiliar',          // AK
+    'beneficioJunaeb',                // AL
+    'chileSolidario',                 // AM
+    'becaIndigena',                   // AN
+    'cuidadosEspeciales',             // AO
+    'medicamentosContraindicados',    // AP
+    'atencionSalud',                  // AQ
+    'contactoEmergencia',             // AR
+    'telefonoEmergencia',             // AS
+    'procedenciaEscuela',             // AT
+    'cursoRepetido'                   // AU
+  ];
+  
+  // Agregar encabezados
+  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+  
+  // Formatear encabezados
+  const headerRange = sheet.getRange(1, 1, 1, headers.length);
+  headerRange.setFontWeight('bold');
+  headerRange.setBackground('#4a86e8');
+  headerRange.setFontColor('#ffffff');
+  headerRange.setHorizontalAlignment('center');
+  
+  // Congelar primera fila
+  sheet.setFrozenRows(1);
+  
+  // Ajustar columnas
+  sheet.autoResizeColumns(1, headers.length);
+  
+  Logger.log('✅ Encabezados creados y formateados');
+}
 
-        .logo {
-            width: 70px;
-            height: 70px;
-            object-fit: contain;
-            margin-right: 12px;
-            vertical-align: middle;
-            filter: brightness(1.2) drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
-        }
+/**
+ * Función de prueba GET
+ */
+function doGet(e) {
+  return ContentService
+    .createTextOutput('✅ Servicio de Pre-Matrícula 2026 - Activo y Funcionando\n\nVersión: 1.0\nEstado: Operativo')
+    .setMimeType(ContentService.MimeType.TEXT);
+}
 
-        .header h1 {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            display: inline;
-        }
+/**
+ * Función de prueba para verificar la configuración
+ */
+function testConnection() {
+  try {
+    Logger.log('=== TEST DE CONEXIÓN ===');
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    Logger.log('✅ Conexión exitosa con: ' + ss.getName());
+    Logger.log('📋 URL: ' + ss.getUrl());
+    
+    let sheet = ss.getSheetByName(SHEET_NAME);
+    if (!sheet) {
+      Logger.log('⚠️ La hoja "' + SHEET_NAME + '" no existe');
+      Logger.log('💡 Se creará automáticamente al recibir el primer envío');
+    } else {
+      Logger.log('✅ Hoja encontrada: ' + SHEET_NAME);
+      Logger.log('📊 Filas actuales: ' + sheet.getLastRow());
+      Logger.log('📊 Columnas: ' + sheet.getLastColumn());
+    }
+    
+    Logger.log('=== TEST COMPLETADO ===');
+    return true;
+  } catch (error) {
+    Logger.log('❌ ERROR EN TEST: ' + error.toString());
+    return false;
+  }
+}
 
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.95;
-        }
-
-        .form-content {
-            padding: 40px;
-        }
-
-        .section {
-            margin-bottom: 40px;
-            padding: 30px;
-            background: #f8f9fa;
-            border-radius: 15px;
-            border-left: 5px solid #667eea;
-        }
-
-        .section-title {
-            font-size: 1.5rem;
-            color: #1e3c72;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #667eea;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .section-title::before {
-            content: "📋";
-            font-size: 1.8rem;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
-
-        label {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
-            font-size: 0.95rem;
-        }
-
-        label .required {
-            color: #e74c3c;
-            margin-left: 3px;
-        }
-
-        input, select, textarea {
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            font-family: inherit;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        select {
-            cursor: pointer;
-            background-color: white;
-        }
-
-        .btn-submit {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 18px 50px;
-            border: none;
-            border-radius: 50px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: block;
-            width: 100%;
-            margin-top: 30px;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
-        }
-
-        .btn-submit:active {
-            transform: translateY(0);
-        }
-
-        .btn-submit:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .loading.active {
-            display: block;
-        }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .success-message {
-            display: none;
-            background: #d4edda;
-            border: 2px solid #c3e6cb;
-            color: #155724;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .success-message.active {
-            display: block;
-        }
-
-        .error-message {
-            display: none;
-            background: #f8d7da;
-            border: 2px solid #f5c6cb;
-            color: #721c24;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .error-message.active {
-            display: block;
-        }
-
-        .info-box {
-            background: #e7f3ff;
-            border-left: 4px solid #2196f3;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-        }
-
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 1.5rem;
-            }
-            
-            .form-content {
-                padding: 20px;
-            }
-
-            .section {
-                padding: 20px;
-            }
-
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1><img src="logo.png" alt="Logo" class="logo">📚 FICHA DE PRE-MATRÍCULA 2026</h1>
-            <p>Liceo Bicentenario Politécnico<br>"Cesareo Aguirre Goyenechea"</p>
-        </div>
-
-        <div class="form-content">
-            <div class="info-box">
-                <strong>📝 Instrucciones:</strong> Complete todos los campos marcados con asterisco (*). La información proporcionada será utilizada para el proceso de matrícula.
-            </div>
-
-            <form id="matriculaForm">
-                
-                <!-- SECCIÓN 1: DATOS DE MATRÍCULA -->
-                <div class="section">
-                    <h2 class="section-title">Datos de Matrícula</h2>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="fechaMatricula">Fecha de Registro <span class="required">*</span></label>
-                            <input type="date" id="fechaMatricula" name="fechaMatricula" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="curso">Curso al que Postula <span class="required">*</span></label>
-                            <select id="curso" name="curso" required>
-                                <option value="">Seleccione...</option>
-                                <option value="1° Medio">1° Medio</option>
-                                <option value="2° Medio">2° Medio</option>
-                                <option value="3° Medio">3° Medio</option>
-                                <option value="4° Medio">4° Medio</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="cursoGestionPasada">Curso de la Gestión Pasada <span class="required">*</span></label>
-                            <select id="cursoGestionPasada" name="cursoGestionPasada" required>
-                                <option value="">Seleccione...</option>
-                                <option value="8° Básico">8° Básico</option>
-                                <option value="1° Medio A">1° Medio A</option>
-                                <option value="1° Medio B">1° Medio B</option>
-                                <option value="1° Medio C">1° Medio C</option>
-                                <option value="2° Medio A">2° Medio A</option>
-                                <option value="2° Medio B">2° Medio B</option>
-                                <option value="2° Medio C">2° Medio C</option>
-                                <option value="3° Medio A">3° Medio A</option>
-                                <option value="3° Medio B">3° Medio B</option>
-                                <option value="3° Medio C">3° Medio C</option>
-                                <option value="Otro">Otro</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="especialidad">Especialidad</label>
-                            <select id="especialidad" name="especialidad">
-                                <option value="">Seleccione...</option>
-                                <option value="Electricidad">Electricidad</option>
-                                <option value="Mecánica">Mecánica</option>
-                                <option value="Electrónica">Electrónica</option>
-                                <option value="Construcción">Construcción</option>
-                                <option value="Otra">Otra</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SECCIÓN 2: DATOS DEL ESTUDIANTE -->
-                <div class="section">
-                    <h2 class="section-title">Datos del Estudiante</h2>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="apellidoPaterno">Apellido Paterno <span class="required">*</span></label>
-                            <input type="text" id="apellidoPaterno" name="apellidoPaterno" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="apellidoMaterno">Apellido Materno <span class="required">*</span></label>
-                            <input type="text" id="apellidoMaterno" name="apellidoMaterno" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="nombres">Nombres <span class="required">*</span></label>
-                            <input type="text" id="nombres" name="nombres" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="run">RUN (sin puntos, con guión) <span class="required">*</span></label>
-                            <input type="text" id="run" name="run" placeholder="12345678-9" required pattern="[0-9]{7,8}-[0-9Kk]">
-                        </div>
-                        <div class="form-group">
-                            <label for="sexo">Sexo <span class="required">*</span></label>
-                            <select id="sexo" name="sexo" required>
-                                <option value="">Seleccione...</option>
-                                <option value="Masculino">Masculino</option>
-                                <option value="Femenino">Femenino</option>
-                                <option value="Otro">Otro</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="fechaNacimiento">Fecha de Nacimiento <span class="required">*</span></label>
-                            <input type="date" id="fechaNacimiento" name="fechaNacimiento" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="edad">Edad <span class="required">*</span></label>
-                            <input type="number" id="edad" name="edad" min="10" max="25" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="lugarNacimiento">Lugar de Nacimiento <span class="required">*</span></label>
-                            <input type="text" id="lugarNacimiento" name="lugarNacimiento" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="pais">País <span class="required">*</span></label>
-                            <input type="text" id="pais" name="pais" value="Chile" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="nacionalidad">Nacionalidad <span class="required">*</span></label>
-                            <input type="text" id="nacionalidad" name="nacionalidad" value="Chilena" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="religion">Religión <span class="required">*</span></label>
-                            <input type="text" id="religion" name="religion" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="etnia">Etnia <span class="required">*</span></label>
-                            <select id="etnia" name="etnia" required>
-                                <option value="">Seleccione...</option>
-                                <option value="Ninguna">Ninguna</option>
-                                <option value="Mapuche">Mapuche</option>
-                                <option value="Aymara">Aymara</option>
-                                <option value="Rapa Nui">Rapa Nui</option>
-                                <option value="Quechua">Quechua</option>
-                                <option value="Otra">Otra</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="celularEstudiante">Celular del Estudiante <span class="required">*</span></label>
-                            <input type="tel" id="celularEstudiante" name="celularEstudiante" placeholder="+56912345678" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="correoEstudiante">Correo Electrónico <span class="required">*</span></label>
-                            <input type="email" id="correoEstudiante" name="correoEstudiante" required>
-                        </div>
-                        <div class="form-group full-width">
-                            <label for="domicilioEstudiante">Domicilio del Estudiante <span class="required">*</span></label>
-                            <input type="text" id="domicilioEstudiante" name="domicilioEstudiante" required>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SECCIÓN 3: DATOS APODERADO TITULAR -->
-                <div class="section">
-                    <h2 class="section-title">Datos del Apoderado Titular</h2>
-                    <div class="form-grid">
-                        <div class="form-group full-width">
-                            <label for="nombreApoderadoTitular">Nombre Completo <span class="required">*</span></label>
-                            <input type="text" id="nombreApoderadoTitular" name="nombreApoderadoTitular" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="correoApoderadoTitular">Correo Electrónico <span class="required">*</span></label>
-                            <input type="email" id="correoApoderadoTitular" name="correoApoderadoTitular" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="fonoApoderadoTitular">Teléfono <span class="required">*</span></label>
-                            <input type="tel" id="fonoApoderadoTitular" name="fonoApoderadoTitular" required>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SECCIÓN 4: DATOS APODERADO SUPLENTE -->
-                <div class="section">
-                    <h2 class="section-title">Datos del Apoderado Suplente</h2>
-                    <div class="form-grid">
-                        <div class="form-group full-width">
-                            <label for="nombreApoderadoSuplente">Nombre Completo <span class="required">*</span></label>
-                            <input type="text" id="nombreApoderadoSuplente" name="nombreApoderadoSuplente" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="correoApoderadoSuplente">Correo Electrónico <span class="required">*</span></label>
-                            <input type="email" id="correoApoderadoSuplente" name="correoApoderadoSuplente" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="fonoApoderadoSuplente">Teléfono <span class="required">*</span></label>
-                            <input type="tel" id="fonoApoderadoSuplente" name="fonoApoderadoSuplente" required>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SECCIÓN 5: INFORMACIÓN FAMILIAR -->
-                <div class="section">
-                    <h2 class="section-title">Información Familiar</h2>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="profesionPadre">Profesión u Oficio del Padre <span class="required">*</span></label>
-                            <input type="text" id="profesionPadre" name="profesionPadre" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="profesionMadre">Profesión u Oficio de la Madre <span class="required">*</span></label>
-                            <input type="text" id="profesionMadre" name="profesionMadre" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="profesionApoderado">Profesión u Oficio del Apoderado</label>
-                            <input type="text" id="profesionApoderado" name="profesionApoderado">
-                        </div>
-                        <div class="form-group">
-                            <label for="personaConQuienVive">Persona con quien vive <span class="required">*</span></label>
-                            <select id="personaConQuienVive" name="personaConQuienVive" required>
-                                <option value="">Seleccione...</option>
-                                <option value="Ambos padres">Ambos padres</option>
-                                <option value="Madre">Madre</option>
-                                <option value="Padre">Padre</option>
-                                <option value="Abuelos">Abuelos</option>
-                                <option value="Otro familiar">Otro familiar</option>
-                                <option value="Otro">Otro</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="totalHijos">Total de Hijos en la Familia <span class="required">*</span></label>
-                            <input type="number" id="totalHijos" name="totalHijos" min="1" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="lugarQueOcupa">Lugar que ocupa entre ellos</label>
-                            <input type="number" id="lugarQueOcupa" name="lugarQueOcupa" min="1">
-                        </div>
-                        <div class="form-group">
-                            <label for="personasEnCasa">Número de personas que habitan en casa</label>
-                            <input type="number" id="personasEnCasa" name="personasEnCasa" min="1">
-                        </div>
-                        <div class="form-group">
-                            <label for="tipoDomicilio">Domicilio</label>
-                            <select id="tipoDomicilio" name="tipoDomicilio">
-                                <option value="">Seleccione...</option>
-                                <option value="Propio">Propio</option>
-                                <option value="Arrendado">Arrendado</option>
-                                <option value="Cedido">Cedido</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="situacionEconomica">Situación Económica</label>
-                            <select id="situacionEconomica" name="situacionEconomica">
-                                <option value="">Seleccione...</option>
-                                <option value="Alta">Alta</option>
-                                <option value="Media-Alta">Media-Alta</option>
-                                <option value="Media">Media</option>
-                                <option value="Media-Baja">Media-Baja</option>
-                                <option value="Baja">Baja</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SECCIÓN 6: BENEFICIOS Y SALUD -->
-                <div class="section">
-                    <h2 class="section-title">Beneficios y Salud</h2>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="subsidioUnicoFamiliar">¿Recibe Subsidio Único Familiar? <span class="required">*</span></label>
-                            <select id="subsidioUnicoFamiliar" name="subsidioUnicoFamiliar" required>
-                                <option value="">Seleccione...</option>
-                                <option value="Sí">Sí</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="beneficioJunaeb">Beneficio JUNAEB <span class="required">*</span></label>
-                            <select id="beneficioJunaeb" name="beneficioJunaeb" required>
-                                <option value="">Seleccione...</option>
-                                <option value="Sí">Sí</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="chileSolidario">Chile Solidario <span class="required">*</span></label>
-                            <select id="chileSolidario" name="chileSolidario" required>
-                                <option value="">Seleccione...</option>
-                                <option value="Sí">Sí</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="becaIndigena">Beca Indígena <span class="required">*</span></label>
-                            <select id="becaIndigena" name="becaIndigena" required>
-                                <option value="">Seleccione...</option>
-                                <option value="Sí">Sí</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
-                        <div class="form-group full-width">
-                            <label for="cuidadosEspeciales">Cuidados Especiales (Enfermedades)</label>
-                            <textarea id="cuidadosEspeciales" name="cuidadosEspeciales" placeholder="Indique si el estudiante tiene alguna enfermedad o condición especial..."></textarea>
-                        </div>
-                        <div class="form-group full-width">
-                            <label for="medicamentosContraindicados">Medicamentos Contraindicados</label>
-                            <textarea id="medicamentosContraindicados" name="medicamentosContraindicados" placeholder="Indique medicamentos a los que el estudiante sea alérgico..."></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="atencionSalud">Sistema de Atención de Salud</label>
-                            <select id="atencionSalud" name="atencionSalud">
-                                <option value="">Seleccione...</option>
-                                <option value="FONASA">FONASA</option>
-                                <option value="ISAPRE">ISAPRE</option>
-                                <option value="Otro">Otro</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SECCIÓN 7: CONTACTO DE EMERGENCIA -->
-                <div class="section">
-                    <h2 class="section-title">Contacto de Emergencia</h2>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="contactoEmergencia">En caso de emergencia llamar a <span class="required">*</span></label>
-                            <input type="text" id="contactoEmergencia" name="contactoEmergencia" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="telefonoEmergencia">Teléfono de Emergencia <span class="required">*</span></label>
-                            <input type="tel" id="telefonoEmergencia" name="telefonoEmergencia" required>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SECCIÓN 8: INFORMACIÓN ACADÉMICA -->
-                <div class="section">
-                    <h2 class="section-title">Información Académica</h2>
-                    <div class="form-grid">
-                        <div class="form-group full-width">
-                            <label for="procedenciaEscuela">Procedencia de Escuela/Colegio</label>
-                            <input type="text" id="procedenciaEscuela" name="procedenciaEscuela">
-                        </div>
-                        <div class="form-group full-width">
-                            <label for="cursoRepetido">Curso que ha repetido (si aplica)</label>
-                            <input type="text" id="cursoRepetido" name="cursoRepetido" placeholder="Ej: 2° Medio">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- BOTÓN DE ENVÍO -->
-                <button type="submit" class="btn-submit" id="submitBtn">
-                    ✅ Enviar Solicitud de Pre-Matrícula
-                </button>
-
-                <!-- LOADING -->
-                <div class="loading" id="loading">
-                    <div class="spinner"></div>
-                    <p>Enviando información...</p>
-                </div>
-
-                <!-- MENSAJES -->
-                <div class="success-message" id="successMessage">
-                    <h3>✅ ¡Formulario enviado exitosamente!</h3>
-                    <p>Hemos recibido su solicitud de pre-matrícula. Nos pondremos en contacto pronto.</p>
-                </div>
-
-                <div class="error-message" id="errorMessage">
-                    <h3>❌ Error al enviar el formulario</h3>
-                    <p id="errorText">Por favor, intente nuevamente.</p>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        // CONFIGURACIÓN - REEMPLAZA CON TU URL DE GOOGLE APPS SCRIPT
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwivDnZGjsc1sPS9odWU1dxnVIMg9cuCwPfSaqYsRYKqWh_70AnvK1MyshF8yCPEZep/exec';
-
-        // Calcular edad automáticamente
-        document.getElementById('fechaNacimiento').addEventListener('change', function() {
-            const fechaNac = new Date(this.value);
-            const hoy = new Date();
-            let edad = hoy.getFullYear() - fechaNac.getFullYear();
-            const mes = hoy.getMonth() - fechaNac.getMonth();
-            
-            if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
-                edad--;
-            }
-            
-            document.getElementById('edad').value = edad;
-        });
-
-        // Fecha actual por defecto
-        document.getElementById('fechaMatricula').valueAsDate = new Date();
-
-        // Manejar envío del formulario
-        document.getElementById('matriculaForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const submitBtn = document.getElementById('submitBtn');
-            const loading = document.getElementById('loading');
-            const successMsg = document.getElementById('successMessage');
-            const errorMsg = document.getElementById('errorMessage');
-            
-            // Resetear mensajes
-            successMsg.classList.remove('active');
-            errorMsg.classList.remove('active');
-            
-            // Mostrar loading
-            submitBtn.disabled = true;
-            loading.classList.add('active');
-            
-            // Recopilar datos del formulario
-            const formData = new FormData(this);
-            const data = Object.fromEntries(formData);
-            
-            try {
-                // Usar no-cors para evitar problemas con Google Apps Script
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                });
-                
-                // Con mode: 'no-cors', asumimos que fue exitoso si no hay error
-                // Mostrar mensaje de éxito
-                successMsg.classList.add('active');
-                this.reset();
-                document.getElementById('fechaMatricula').valueAsDate = new Date();
-                
-                // Scroll al mensaje de éxito
-                successMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                
-            } catch (error) {
-                // Solo mostramos error si realmente falló la conexión
-                errorMsg.classList.add('active');
-                document.getElementById('errorText').textContent = 
-                    'Error de conexión. Por favor, verifique su internet e intente nuevamente.';
-                errorMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            } finally {
-                loading.classList.remove('active');
-                submitBtn.disabled = false;
-            }
-        });
-    </script>
-</body>
-</html>
+/**
+ * Función para simular un envío de prueba
+ */
+function testSubmit() {
+  Logger.log('=== PRUEBA DE ENVÍO ===');
+  
+  const testData = {
+    parameter: {
+      fechaMatricula: '2026-01-15',
+      curso: '1° Medio',
+      apellidoPaterno: 'Pérez',
+      apellidoMaterno: 'González',
+      nombres: 'Juan Carlos',
+      run: '12345678-9',
+      sexo: 'Masculino',
+      fechaNacimiento: '2010-05-20',
+      edad: '15',
+      contactoEmergencia: 'María Pérez',
+      telefonoEmergencia: '+56912345678',
+      subsidioUnicoFamiliar: 'No',
+      beneficioJunaeb: 'Sí',
+      chileSolidario: 'No',
+      becaIndigena: 'No'
+    }
+  };
+  
+  const result = doPost(testData);
+  Logger.log('Resultado: ' + result.getContent());
+  Logger.log('=== PRUEBA COMPLETADA ===');
+}
