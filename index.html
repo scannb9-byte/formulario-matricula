@@ -282,15 +282,22 @@
                             </select>
                         </div>
                         <div class="form-group">
-                        <label for="cursoGestionPasada">Curso de la Gestión Pasada <span class="required">*</span></label>
-                        <select id="cursoGestionPasada" name="cursoGestionPasada" required>
-                            <option value="">Seleccione...</option>
-                            <option value="1º">1º Medio A</option>
-                            <option value="2º">2º Medio A</option>
-                            <option value="3º">3º Medio A</option>
-                            <option value="4º">4º Medio A</option>
-                        </select>
-                    </div>
+                            <label for="cursoGestionPasada">Curso de la Gestión Pasada <span class="required">*</span></label>
+                            <select id="cursoGestionPasada" name="cursoGestionPasada" required>
+                                <option value="">Seleccione...</option>
+                                <option value="8° Básico">8° Básico</option>
+                                <option value="1° Medio A">1° Medio A</option>
+                                <option value="1° Medio B">1° Medio B</option>
+                                <option value="1° Medio C">1° Medio C</option>
+                                <option value="2° Medio A">2° Medio A</option>
+                                <option value="2° Medio B">2° Medio B</option>
+                                <option value="2° Medio C">2° Medio C</option>
+                                <option value="3° Medio A">3° Medio A</option>
+                                <option value="3° Medio B">3° Medio B</option>
+                                <option value="3° Medio C">3° Medio C</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                        </div>
                         <div class="form-group">
                             <label for="especialidad">Especialidad</label>
                             <select id="especialidad" name="especialidad">
@@ -339,19 +346,19 @@
                             <input type="date" id="fechaNacimiento" name="fechaNacimiento" required>
                         </div>
                         <div class="form-group">
-                            <label for="edad">Edad<span class="required">*</span></label>
-                            <input type="number" id="edad" name="edad" min="10" max="25"required>
+                            <label for="edad">Edad <span class="required">*</span></label>
+                            <input type="number" id="edad" name="edad" min="10" max="25" required>
                         </div>
                         <div class="form-group">
                             <label for="lugarNacimiento">Lugar de Nacimiento <span class="required">*</span></label>
                             <input type="text" id="lugarNacimiento" name="lugarNacimiento" required>
                         </div>
                         <div class="form-group">
-                           <label for="pais">País <span class="required">*</span></label>
+                            <label for="pais">País <span class="required">*</span></label>
                             <input type="text" id="pais" name="pais" value="Chile" required>
                         </div>
                         <div class="form-group">
-                           <label for="nacionalidad">Nacionalidad <span class="required">*</span></label>
+                            <label for="nacionalidad">Nacionalidad <span class="required">*</span></label>
                             <input type="text" id="nacionalidad" name="nacionalidad" value="Chilena" required>
                         </div>
                         <div class="form-group">
@@ -359,7 +366,7 @@
                             <input type="text" id="religion" name="religion" required>
                         </div>
                         <div class="form-group">
-                           <label for="etnia">Etnia <span class="required">*</span></label>
+                            <label for="etnia">Etnia <span class="required">*</span></label>
                             <select id="etnia" name="etnia" required>
                                 <option value="">Seleccione...</option>
                                 <option value="Ninguna">Ninguna</option>
@@ -414,7 +421,7 @@
                         </div>
                         <div class="form-group">
                             <label for="correoApoderadoSuplente">Correo Electrónico <span class="required">*</span></label>
-                            <input type="email" id="correoApoderadoSuplente" name="correoApoderadoSuplente" required>    
+                            <input type="email" id="correoApoderadoSuplente" name="correoApoderadoSuplente" required>
                         </div>
                         <div class="form-group">
                             <label for="fonoApoderadoSuplente">Teléfono <span class="required">*</span></label>
@@ -433,7 +440,7 @@
                         </div>
                         <div class="form-group">
                             <label for="profesionMadre">Profesión u Oficio de la Madre <span class="required">*</span></label>
-                            <input type="text" id="profesionMadre" name="profesionMadre" required>    
+                            <input type="text" id="profesionMadre" name="profesionMadre" required>
                         </div>
                         <div class="form-group">
                             <label for="profesionApoderado">Profesión u Oficio del Apoderado</label>
@@ -476,14 +483,13 @@
                             <label for="situacionEconomica">Situación Económica</label>
                             <select id="situacionEconomica" name="situacionEconomica">
                                 <option value="">Seleccione...</option>
-                                <option value="Alta">Alta (+$900.000)</option>
-                                <option value="Media-Alta">Media-Alta ($700.001 - $900.000)</option>
-                                <option value="Media">Media ($500.001 - $700.000)</option>
-                                <option value="Media-Baja">Media-Baja ($300.001 - $500.000)</option>
-                                <option value="Baja">Baja (- $300.000)</option>
+                                <option value="Alta">Alta</option>
+                                <option value="Media-Alta">Media-Alta</option>
+                                <option value="Media">Media</option>
+                                <option value="Media-Baja">Media-Baja</option>
+                                <option value="Baja">Baja</option>
                             </select>
                         </div>
-
                     </div>
                 </div>
 
@@ -509,14 +515,14 @@
                         </div>
                         <div class="form-group">
                             <label for="chileSolidario">Chile Solidario <span class="required">*</span></label>
-                            <select id="chileSolidario" name="chileSolidario" required>    
+                            <select id="chileSolidario" name="chileSolidario" required>
                                 <option value="">Seleccione...</option>
                                 <option value="Sí">Sí</option>
                                 <option value="No">No</option>
                             </select>
                         </div>
                         <div class="form-group">
-                           <label for="becaIndigena">Beca Indígena <span class="required">*</span></label>
+                            <label for="becaIndigena">Beca Indígena <span class="required">*</span></label>
                             <select id="becaIndigena" name="becaIndigena" required>
                                 <option value="">Seleccione...</option>
                                 <option value="Sí">Sí</option>
@@ -674,6 +680,3 @@
     </script>
 </body>
 </html>
-
-
-
