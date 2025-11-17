@@ -282,6 +282,16 @@
                             </select>
                         </div>
                         <div class="form-group">
+                        <label for="cursoGestionPasada">Curso de la Gestión Pasada <span class="required">*</span></label>
+                        <select id="cursoGestionPasada" name="cursoGestionPasada" required>
+                            <option value="">Seleccione...</option>
+                            <option value="1º">1º Medio A</option>
+                            <option value="2º">2º Medio A</option>
+                            <option value="3º">3º Medio A</option>
+                            <option value="4º">4º Medio A</option>
+                        </select>
+                    </div>
+                        <div class="form-group">
                             <label for="especialidad">Especialidad</label>
                             <select id="especialidad" name="especialidad">
                                 <option value="">Seleccione...</option>
@@ -329,28 +339,28 @@
                             <input type="date" id="fechaNacimiento" name="fechaNacimiento" required>
                         </div>
                         <div class="form-group">
-                            <label for="edad">Edad</label>
-                            <input type="number" id="edad" name="edad" min="10" max="25">
+                            <label for="edad">Edad<span class="required">*</span></label>
+                            <input type="number" id="edad" name="edad" min="10" max="25"required>
                         </div>
                         <div class="form-group">
-                            <label for="lugarNacimiento">Lugar de Nacimiento</label>
-                            <input type="text" id="lugarNacimiento" name="lugarNacimiento">
+                            <label for="lugarNacimiento">Lugar de Nacimiento <span class="required">*</span></label>
+                            <input type="text" id="lugarNacimiento" name="lugarNacimiento" required>
                         </div>
                         <div class="form-group">
-                            <label for="pais">País</label>
-                            <input type="text" id="pais" name="pais" value="Chile">
+                           <label for="pais">País <span class="required">*</span></label>
+                            <input type="text" id="pais" name="pais" value="Chile" required>
                         </div>
                         <div class="form-group">
-                            <label for="nacionalidad">Nacionalidad</label>
-                            <input type="text" id="nacionalidad" name="nacionalidad" value="Chilena">
+                           <label for="nacionalidad">Nacionalidad <span class="required">*</span></label>
+                            <input type="text" id="nacionalidad" name="nacionalidad" value="Chilena" required>
                         </div>
                         <div class="form-group">
-                            <label for="religion">Religión</label>
-                            <input type="text" id="religion" name="religion">
+                            <label for="religion">Religión <span class="required">*</span></label>
+                            <input type="text" id="religion" name="religion" required>
                         </div>
                         <div class="form-group">
-                            <label for="etnia">Etnia</label>
-                            <select id="etnia" name="etnia">
+                           <label for="etnia">Etnia <span class="required">*</span></label>
+                            <select id="etnia" name="etnia" required>
                                 <option value="">Seleccione...</option>
                                 <option value="Ninguna">Ninguna</option>
                                 <option value="Mapuche">Mapuche</option>
@@ -361,12 +371,12 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="celularEstudiante">Celular del Estudiante</label>
-                            <input type="tel" id="celularEstudiante" name="celularEstudiante" placeholder="+56912345678">
+                            <label for="celularEstudiante">Celular del Estudiante <span class="required">*</span></label>
+                            <input type="tel" id="celularEstudiante" name="celularEstudiante" placeholder="+56912345678" required>
                         </div>
                         <div class="form-group">
-                            <label for="correoEstudiante">Correo Electrónico</label>
-                            <input type="email" id="correoEstudiante" name="correoEstudiante">
+                            <label for="correoEstudiante">Correo Electrónico <span class="required">*</span></label>
+                            <input type="email" id="correoEstudiante" name="correoEstudiante" required>
                         </div>
                         <div class="form-group full-width">
                             <label for="domicilioEstudiante">Domicilio del Estudiante <span class="required">*</span></label>
@@ -399,16 +409,16 @@
                     <h2 class="section-title">Datos del Apoderado Suplente</h2>
                     <div class="form-grid">
                         <div class="form-group full-width">
-                            <label for="nombreApoderadoSuplente">Nombre Completo</label>
-                            <input type="text" id="nombreApoderadoSuplente" name="nombreApoderadoSuplente">
+                            <label for="nombreApoderadoSuplente">Nombre Completo <span class="required">*</span></label>
+                            <input type="text" id="nombreApoderadoSuplente" name="nombreApoderadoSuplente" required>
                         </div>
                         <div class="form-group">
-                            <label for="correoApoderadoSuplente">Correo Electrónico</label>
-                            <input type="email" id="correoApoderadoSuplente" name="correoApoderadoSuplente">
+                            <label for="correoApoderadoSuplente">Correo Electrónico <span class="required">*</span></label>
+                            <input type="email" id="correoApoderadoSuplente" name="correoApoderadoSuplente" required>    
                         </div>
                         <div class="form-group">
-                            <label for="fonoApoderadoSuplente">Teléfono</label>
-                            <input type="tel" id="fonoApoderadoSuplente" name="fonoApoderadoSuplente">
+                            <label for="fonoApoderadoSuplente">Teléfono <span class="required">*</span></label>
+                            <input type="tel" id="fonoApoderadoSuplente" name="fonoApoderadoSuplente" required>
                         </div>
                     </div>
                 </div>
@@ -418,20 +428,20 @@
                     <h2 class="section-title">Información Familiar</h2>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="profesionPadre">Profesión u Oficio del Padre</label>
-                            <input type="text" id="profesionPadre" name="profesionPadre">
+                            <label for="profesionPadre">Profesión u Oficio del Padre <span class="required">*</span></label>
+                            <input type="text" id="profesionPadre" name="profesionPadre" required>
                         </div>
                         <div class="form-group">
-                            <label for="profesionMadre">Profesión u Oficio de la Madre</label>
-                            <input type="text" id="profesionMadre" name="profesionMadre">
+                            <label for="profesionMadre">Profesión u Oficio de la Madre <span class="required">*</span></label>
+                            <input type="text" id="profesionMadre" name="profesionMadre" required>    
                         </div>
                         <div class="form-group">
                             <label for="profesionApoderado">Profesión u Oficio del Apoderado</label>
                             <input type="text" id="profesionApoderado" name="profesionApoderado">
                         </div>
                         <div class="form-group">
-                            <label for="personaConQuienVive">Persona con quien vive</label>
-                            <select id="personaConQuienVive" name="personaConQuienVive">
+                            <label for="personaConQuienVive">Persona con quien vive <span class="required">*</span></label>
+                            <select id="personaConQuienVive" name="personaConQuienVive" required>
                                 <option value="">Seleccione...</option>
                                 <option value="Ambos padres">Ambos padres</option>
                                 <option value="Madre">Madre</option>
@@ -442,8 +452,8 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="totalHijos">Total de Hijos en la Familia</label>
-                            <input type="number" id="totalHijos" name="totalHijos" min="1">
+                            <label for="totalHijos">Total de Hijos en la Familia <span class="required">*</span></label>
+                            <input type="number" id="totalHijos" name="totalHijos" min="1" required>
                         </div>
                         <div class="form-group">
                             <label for="lugarQueOcupa">Lugar que ocupa entre ellos</label>
@@ -466,17 +476,14 @@
                             <label for="situacionEconomica">Situación Económica</label>
                             <select id="situacionEconomica" name="situacionEconomica">
                                 <option value="">Seleccione...</option>
-                                <option value="Alta">Alta</option>
-                                <option value="Media-Alta">Media-Alta</option>
-                                <option value="Media">Media</option>
-                                <option value="Media-Baja">Media-Baja</option>
-                                <option value="Baja">Baja</option>
+                                <option value="Alta">Alta (+$900.000)</option>
+                                <option value="Media-Alta">Media-Alta ($700.001 - $900.000)</option>
+                                <option value="Media">Media ($500.001 - $700.000)</option>
+                                <option value="Media-Baja">Media-Baja ($300.001 - $500.000)</option>
+                                <option value="Baja">Baja (- $300.000)</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="rentaFamiliar">Renta Familiar Aproximada</label>
-                            <input type="text" id="rentaFamiliar" name="rentaFamiliar" placeholder="Ej: $500.000">
-                        </div>
+
                     </div>
                 </div>
 
@@ -485,32 +492,32 @@
                     <h2 class="section-title">Beneficios y Salud</h2>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="subsidioUnicoFamiliar">¿Recibe Subsidio Único Familiar?</label>
-                            <select id="subsidioUnicoFamiliar" name="subsidioUnicoFamiliar">
+                            <label for="subsidioUnicoFamiliar">¿Recibe Subsidio Único Familiar? <span class="required">*</span></label>
+                            <select id="subsidioUnicoFamiliar" name="subsidioUnicoFamiliar" required>
                                 <option value="">Seleccione...</option>
                                 <option value="Sí">Sí</option>
                                 <option value="No">No</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="beneficioJunaeb">Beneficio JUNAEB</label>
-                            <select id="beneficioJunaeb" name="beneficioJunaeb">
+                            <label for="beneficioJunaeb">Beneficio JUNAEB <span class="required">*</span></label>
+                            <select id="beneficioJunaeb" name="beneficioJunaeb" required>
                                 <option value="">Seleccione...</option>
                                 <option value="Sí">Sí</option>
                                 <option value="No">No</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="chileSolidario">Chile Solidario</label>
-                            <select id="chileSolidario" name="chileSolidario">
+                            <label for="chileSolidario">Chile Solidario <span class="required">*</span></label>
+                            <select id="chileSolidario" name="chileSolidario" required>    
                                 <option value="">Seleccione...</option>
                                 <option value="Sí">Sí</option>
                                 <option value="No">No</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="becaIndigena">Beca Indígena</label>
-                            <select id="becaIndigena" name="becaIndigena">
+                           <label for="becaIndigena">Beca Indígena <span class="required">*</span></label>
+                            <select id="becaIndigena" name="becaIndigena" required>
                                 <option value="">Seleccione...</option>
                                 <option value="Sí">Sí</option>
                                 <option value="No">No</option>
@@ -667,5 +674,6 @@
     </script>
 </body>
 </html>
+
 
 
