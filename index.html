@@ -606,7 +606,7 @@
 
     <script>
         // CONFIGURACIÓN - REEMPLAZA CON TU URL DE GOOGLE APPS SCRIPT
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzabnUR4Y2rjgb_WN-sM71_Hj8dZFmcqgz-093L3x2ReQjuGllbR3mS87n9O-n1iLkvvg/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzAMswelJrcVMNXZDvzrstGK_5AGC2TzdzQvBMkjH8Lp6vIYtxgV2pvRik4owRZdZQb/exec';
 
         // Calcular edad automáticamente
         document.getElementById('fechaNacimiento').addEventListener('change', function() {
@@ -643,23 +643,20 @@
             loading.classList.add('active');
             
             // Recopilar datos del formulario
-            const formData = new FormData(this);
-            
-            // Convertir FormData a URLSearchParams
-            const params = new URLSearchParams();
-            for (let [key, value] of formData.entries()) {
-                params.append(key, value);
-            }
-            
-            try {
-                // MÉTODO 1: Intentar con fetch normal
-                console.log('Enviando datos a:', SCRIPT_URL);
-                
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: params,
-                    redirect: 'follow'
-                });
+const formData = new FormData(this);
+
+// Convertir a URLSearchParams
+const params = new URLSearchParams();
+for (let [key, value] of formData.entries()) {
+    params.append(key, value);
+}
+
+try {
+    // Enviar datos
+    const response = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: params
+    });
                 
                 console.log('Respuesta recibida, status:', response.status);
                 
@@ -725,3 +722,4 @@
     </script>
 </body>
 </html>
+
