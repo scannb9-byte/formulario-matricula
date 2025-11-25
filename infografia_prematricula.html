@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pre-Matrícula 2026 - Liceo Bicentenario Cesareo Aguirre Goyenechea</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .infografia {
+            background: white;
+            width: 100%;
+            max-width: 800px;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .header h2 {
+            font-size: 18px;
+            font-weight: 400;
+            opacity: 0.95;
+            line-height: 1.4;
+        }
+        
+        .badge {
+            background: #ffd700;
+            color: #1e3c72;
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .fechas-importantes {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(238, 90, 111, 0.3);
+        }
+        
+        .fechas-importantes h3 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 700;
+        }
+        
+        .fecha-item {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .fecha-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .fecha-icon {
+            font-size: 32px;
+            margin-right: 15px;
+        }
+        
+        .fecha-text {
+            flex: 1;
+        }
+        
+        .fecha-text strong {
+            display: block;
+            font-size: 18px;
+            margin-bottom: 3px;
+        }
+        
+        .fecha-text span {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .qr-section {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(79, 172, 254, 0.3);
+        }
+        
+        .qr-section h3 {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        
+        .qr-container {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        
+        .qr-container img {
+            width: 250px;
+            height: 250px;
+            display: block;
+        }
+        
+        .link-box {
+            background: rgba(255,255,255,0.3);
+            padding: 12px 20px;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            word-break: break-all;
+            backdrop-filter: blur(10px);
+        }
+        
+        .informacion-necesaria {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .informacion-necesaria h3 {
+            color: #2a5298;
+            font-size: 22px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 700;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .info-item {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+        }
+        
+        .info-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.12);
+        }
+        
+        .info-icon {
+            font-size: 28px;
+            margin-right: 12px;
+        }
+        
+        .info-text {
+            font-size: 13px;
+            color: #333;
+            line-height: 1.4;
+        }
+        
+        .documentos {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(245, 87, 108, 0.3);
+        }
+        
+        .documentos h3 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 700;
+        }
+        
+        .doc-list {
+            list-style: none;
+        }
+        
+        .doc-list li {
+            background: rgba(255,255,255,0.2);
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .doc-list li:before {
+            content: "✓";
+            font-size: 22px;
+            margin-right: 12px;
+            font-weight: bold;
+        }
+        
+        .nota-importante {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .nota-importante strong {
+            color: #856404;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .nota-importante p {
+            color: #856404;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .footer {
+            background: #1e3c72;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .footer h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .footer p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .infografia {
+                box-shadow: none;
+                max-width: 100%;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .header h2 {
+                font-size: 16px;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .qr-container img {
+                width: 200px;
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="infografia">
+        <div class="header">
+            <h1>📚 PRE-MATRÍCULA 2026</h1>
+            <h2>Liceo Bicentenario<br>Cesareo Aguirre Goyenechea</h2>
+            <div class="badge">1°, 2º, 3º y 4° MEDIO</div>
+        </div>
+        
+        <div class="content">
+            <div class="fechas-importantes">
+                <h3>📅 FECHAS IMPORTANTES</h3>
+                <div class="fecha-item">
+                    <div class="fecha-icon">🌐</div>
+                    <div class="fecha-text">
+                        <strong>PRE-MATRÍCULA ONLINE</strong>
+                        <span>Del 15 al 18 de Diciembre</span>
+                    </div>
+                </div>
+                <div class="fecha-item">
+                    <div class="fecha-icon">📍</div>
+                    <div class="fecha-text">
+                        <strong>ENTREGA DE DOCUMENTOS</strong>
+                        <span>22 y 23 de Diciembre (Presencial en el Liceo)</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="qr-section">
+                <h3>🔗 ACCEDE AL FORMULARIO</h3>
+                <div class="qr-container">
+                    <img src="/mnt/user-data/uploads/Captura_de_pantalla_2025-11-15_205827.png" alt="Código QR Pre-matrícula">
+                </div>
+                <p style="color: white; margin-bottom: 10px; font-weight: 600;">Escanea el código QR con tu celular</p>
+                <p style="color: white; margin-bottom: 10px;">o ingresa al siguiente link:</p>
+                <div class="link-box">
+                    <a href="https://scannb9-byte.github.io/formulario-matricula/index.html" target="_blank">
+                        https://scannb9-byte.github.io/formulario-matricula/index.html
+                    </a>
+                </div>
+            </div>
+            
+            <div class="informacion-necesaria">
+                <h3>📋 INFORMACIÓN QUE NECESITARÁS</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-icon">👤</div>
+                        <div class="info-text"><strong>Datos del Estudiante</strong><br>RUT, nombre completo, fecha de nacimiento, correo, teléfono</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">👨‍👩‍👦</div>
+                        <div class="info-text"><strong>Apoderados</strong><br>Datos titular y suplente</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">🏠</div>
+                        <div class="info-text"><strong>Domicilio</strong><br>Dirección completa actualizada</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">📞</div>
+                        <div class="info-text"><strong>Contactos</strong><br>Teléfonos y email</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">🏥</div>
+                        <div class="info-text"><strong>Salud</strong><br>Información médica del estudiante</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">🎓</div>
+                        <div class="info-text"><strong>Datos Académicos</strong><br>Establecimiento y curso actual</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nota-importante">
+                <strong>⚠️ IMPORTANTE: ⚠️</strong>
+                <p>• Los campos marcados con asterisco (*) son OBLIGATORIOS</p>
+                <p>• Se recomienda completar TODOS los campos para agilizar el proceso</p>
+                <p>• Revise bien la información antes de enviar</p>
+            </div>
+            
+            <div class="documentos">
+                <h3>📄 DOCUMENTOS PARA EL 22 y 23 DE DICIEMBRE</h3>
+                <ul class="doc-list">
+                    <li>Certificado de Nacimiento</li>
+                    <li>Certificado de Estudios</li>
+                    <li>Fotocopia de Cédula de Identidad</li>
+                    <li>Registro Social de Hogares (si corresponde)</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <h3>Liceo Bicentenario Cesareo Aguirre Goyenechea</h3>
+            <p>¡Les esperamos en 2026! 🎓</p>
+        </div>
+    </div>
+</body>
+</html>
