@@ -202,6 +202,12 @@
             font-size: 14px;
         }
 
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #0066cc;
+        }
+
         @media (max-width: 768px) {
             h1 {
                 font-size: 20px;
@@ -227,7 +233,7 @@
                     <img src="logo.png" alt="Logo Liceo" onerror="this.parentElement.innerHTML='<div style=\'display:flex;align-items:center;justify-content:center;height:100%;color:#003366;font-weight:bold;\'>LOGO</div>'">
                 </div>
                 <div>
-                    <h1>Liceo Bicentenario Politécnico<br>Cesáreo Aguirre Goyenechea<BR>Portal de Descargas</h1>
+                    <h1>Liceo Bicentenario Politécnico<br>Cesáreo Aguirre Goyenechea<br>Portal de Descargas</h1>
                 </div>
             </div>
             
@@ -261,22 +267,30 @@
 
         <div class="stats-section">
             <div class="stat-card">
-                <div class="stat-number" id="totalVisits">0</div>
-                <div class="stat-label">Visitas Totales</div>
+                <div class="stat-number" id="totalVisits">
+                    <div class="loading">Cargando...</div>
+                </div>
+                <div class="stat-label">Dispositivos Únicos</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="totalDownloads">0</div>
+                <div class="stat-number" id="totalDownloads">
+                    <div class="loading">Cargando...</div>
+                </div>
                 <div class="stat-label">Descargas Totales</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="todayVisits">0</div>
+                <div class="stat-number" id="todayVisits">
+                    <div class="loading">Cargando...</div>
+                </div>
                 <div class="stat-label">Visitas Hoy</div>
             </div>
         </div>
 
         <div class="content">
             <h2 class="section-title">📄 Documentos Disponibles</h2>
-            <div class="downloads-grid" id="downloadsGrid"></div>
+            <div class="downloads-grid" id="downloadsGrid">
+                <div class="loading">Cargando documentos...</div>
+            </div>
 
             <div class="map-section">
                 <h2 class="section-title">📍 Ubicación</h2>
@@ -295,117 +309,132 @@
 
         <div class="footer">
             <p>&copy; 2024 Liceo Bicentenario Politécnico Cesáreo Aguirre Goyenechea</p>
-            <p>Formando profesionales para el futuro de Chile - Unidad de Informática</p>
+            <p>Formando profesionales para el futuro de Chile</p>
         </div>
     </div>
 
     <script>
         const documents = [
-{ id: 1, title: 'Reglamento Interno 2025', file: 'RInterno25.pdf' },
+            { id: 1, title: 'Reglamento Interno 2025', file: 'RInterno25.pdf' },
             { id: 2, title: 'Plan de Sexualidad, Afectividad y Genero', file: 'PSexualidad25.pdf' },
             { id: 3, title: 'Plan Integral de Seguridad Escolar 2025(PISE)', file: 'PISE2025.pdf' },
             { id: 4, title: 'Plan de Formación Ciudadana 2025', file: 'PFCiudadana.pdf' }
         ];
 
-        let globalStats = {
+        // Variables globales
+        let stats = {
             totalVisits: 0,
             todayVisits: 0,
             totalDownloads: 0,
             downloads: {},
-            uniqueDevices: [],
-            dailyVisits: {}
+            devices: {},
+            lastResetDate: new Date().toDateString()
         };
 
-        function generateDeviceId() {
-            let deviceId = localStorage.getItem('deviceId');
+        // Generar ID único para el dispositivo
+        function getDeviceId() {
+            let deviceId = localStorage.getItem('liceo_device_id');
             if (!deviceId) {
-                deviceId = 'device_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                localStorage.setItem('deviceId', deviceId);
+                deviceId = 'dev_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('liceo_device_id', deviceId);
             }
             return deviceId;
         }
 
-        async function loadGlobalStats() {
+        // Cargar estadísticas desde storage
+        async function loadStats() {
             try {
-                const result = await window.storage.get('liceo_global_stats', true);
+                const result = await window.storage.get('liceo_stats_v2', true);
                 if (result && result.value) {
-                    globalStats = JSON.parse(result.value);
+                    stats = JSON.parse(result.value);
+                    
+                    // Resetear visitas del día si cambió la fecha
+                    const today = new Date().toDateString();
+                    if (stats.lastResetDate !== today) {
+                        stats.todayVisits = 0;
+                        stats.lastResetDate = today;
+                    }
                 } else {
+                    // Inicializar por primera vez
                     documents.forEach(doc => {
-                        globalStats.downloads[doc.id] = 0;
+                        stats.downloads[doc.id] = 0;
                     });
+                    stats.devices = {};
                 }
             } catch (error) {
+                console.log('Inicializando estadísticas por primera vez');
                 documents.forEach(doc => {
-                    globalStats.downloads[doc.id] = 0;
+                    stats.downloads[doc.id] = 0;
                 });
+                stats.devices = {};
             }
         }
 
-        async function saveGlobalStats() {
+        // Guardar estadísticas
+        async function saveStats() {
             try {
-                await window.storage.set('liceo_global_stats', JSON.stringify(globalStats), true);
+                await window.storage.set('liceo_stats_v2', JSON.stringify(stats), true);
+                return true;
             } catch (error) {
-                console.error('Error guardando estadísticas:', error);
+                console.error('Error al guardar:', error);
+                return false;
             }
         }
 
+        // Registrar visita del dispositivo
         async function registerVisit() {
-            const deviceId = generateDeviceId();
+            const deviceId = getDeviceId();
             const today = new Date().toDateString();
-            
-            if (!globalStats.uniqueDevices) {
-                globalStats.uniqueDevices = [];
+
+            // Si es un dispositivo nuevo
+            if (!stats.devices[deviceId]) {
+                stats.devices[deviceId] = {
+                    firstVisit: today,
+                    lastVisit: today,
+                    visitDates: [today]
+                };
+                stats.totalVisits++;
+            } else {
+                // Actualizar última visita
+                stats.devices[deviceId].lastVisit = today;
+                
+                // Si no ha visitado hoy, agregar fecha
+                if (!stats.devices[deviceId].visitDates.includes(today)) {
+                    stats.devices[deviceId].visitDates.push(today);
+                }
             }
-            
-            if (!globalStats.dailyVisits) {
-                globalStats.dailyVisits = {};
-            }
-            
-            const isNewDevice = !globalStats.uniqueDevices.includes(deviceId);
-            
-            if (isNewDevice) {
-                globalStats.uniqueDevices.push(deviceId);
-                globalStats.totalVisits++;
-            }
-            
-            if (!globalStats.dailyVisits[today]) {
-                globalStats.dailyVisits[today] = [];
-            }
-            
-            if (!globalStats.dailyVisits[today].includes(deviceId)) {
-                globalStats.dailyVisits[today].push(deviceId);
-            }
-            
-            globalStats.todayVisits = globalStats.dailyVisits[today].length;
-            
-            await saveGlobalStats();
+
+            // Contar visitas únicas de hoy
+            stats.todayVisits = Object.values(stats.devices).filter(device => 
+                device.visitDates.includes(today)
+            ).length;
+
+            await saveStats();
             updateStatsDisplay();
         }
 
-        async function initStats() {
-            await loadGlobalStats();
-            await registerVisit();
-        }
-
+        // Actualizar visualización de estadísticas
         function updateStatsDisplay() {
-            document.getElementById('totalVisits').textContent = globalStats.totalVisits || 0;
-            document.getElementById('todayVisits').textContent = globalStats.todayVisits || 0;
-            document.getElementById('totalDownloads').textContent = globalStats.totalDownloads || 0;
+            document.getElementById('totalVisits').textContent = stats.totalVisits;
+            document.getElementById('todayVisits').textContent = stats.todayVisits;
+            document.getElementById('totalDownloads').textContent = stats.totalDownloads;
         }
 
+        // Manejar descarga de archivo
         async function handleDownload(docId, filename) {
-            if (!globalStats.downloads[docId]) {
-                globalStats.downloads[docId] = 0;
+            // Incrementar contador
+            if (!stats.downloads[docId]) {
+                stats.downloads[docId] = 0;
             }
-            globalStats.downloads[docId]++;
-            globalStats.totalDownloads++;
-            
-            await saveGlobalStats();
+            stats.downloads[docId]++;
+            stats.totalDownloads++;
+
+            // Guardar y actualizar
+            await saveStats();
             updateStatsDisplay();
             renderDownloads();
-            
-            // Crear enlace temporal para la descarga
+
+            // Realizar descarga
             const link = document.createElement('a');
             link.href = filename;
             link.download = filename;
@@ -415,6 +444,7 @@
             document.body.removeChild(link);
         }
 
+        // Renderizar lista de documentos
         function renderDownloads() {
             const grid = document.getElementById('downloadsGrid');
             grid.innerHTML = documents.map(doc => `
@@ -422,7 +452,7 @@
                     <div class="download-info">
                         <div class="download-title">${doc.title}</div>
                         <div class="download-stats">
-                            📥 ${globalStats.downloads[doc.id] || 0} descargas
+                            📥 ${stats.downloads[doc.id] || 0} descargas
                         </div>
                     </div>
                     <button class="download-btn" onclick="handleDownload(${doc.id}, '${doc.file}')">
@@ -432,10 +462,24 @@
             `).join('');
         }
 
-        // Inicializar cuando cargue la página
-        initStats().then(() => {
-            renderDownloads();
-        });
+        // Inicializar aplicación
+        async function init() {
+            try {
+                await loadStats();
+                await registerVisit();
+                renderDownloads();
+            } catch (error) {
+                console.error('Error al inicializar:', error);
+                // Mostrar valores por defecto en caso de error
+                document.getElementById('totalVisits').textContent = '0';
+                document.getElementById('todayVisits').textContent = '0';
+                document.getElementById('totalDownloads').textContent = '0';
+                renderDownloads();
+            }
+        }
+
+        // Iniciar cuando la página cargue
+        init();
     </script>
 </body>
 </html>
