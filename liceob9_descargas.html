@@ -305,8 +305,6 @@
             { id: 2, title: 'Plan de Sexualidad, Afectividad y Genero', file: 'PSexualidad25.pdf' },
             { id: 3, title: 'Plan Integral de Seguridad Escolar 2025(PISE)', file: 'PISE2025.pdf' },
             { id: 4, title: 'Plan de Formación Ciudadana 2025', file: 'PFCiudadana.pdf' }
-           // { id: 5, title: 'Manual de Procedimientos', file: 'manual_procedimientos.pdf' },
-            //{ id: 6, title: 'Calendario Académico 2024', file: 'calendario_academico.pdf' }
         ];
 
         let stats = {
@@ -364,7 +362,14 @@
             updateStatsDisplay();
             renderDownloads();
             
-            alert(`Descargando: ${filename}\n\nNota: Coloca tus archivos PDF en la misma carpeta que este HTML.`);
+            // Crear enlace temporal para la descarga
+            const link = document.createElement('a');
+            link.href = filename;
+            link.download = filename;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         function renderDownloads() {
