@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gala · Arte, Cultura e Identidad</title>
+<style>
+:root{
+  --azul:#071b46;
+  --azul2:#0c3f91;
+  --azul3:#1d63b6;
+  --celeste:#b9ddfa;
+  --celeste2:#e9f5ff;
+  --blanco:#ffffff;
+  --sombra:0 22px 60px rgba(7,27,70,.20);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;color:var(--azul);background:#f7fbff}
+body{overflow-x:hidden}
+body:before{
+  content:"";position:fixed;inset:0;z-index:-3;
+  background:
+    radial-gradient(circle at 12% 10%,rgba(185,221,250,.65),transparent 28%),
+    radial-gradient(circle at 88% 20%,rgba(29,99,182,.13),transparent 30%),
+    linear-gradient(180deg,#fff 0%,#eef8ff 100%);
+}
+.waves{position:fixed;left:0;right:0;bottom:-2px;height:155px;z-index:-2;overflow:hidden;pointer-events:none}
+.wave{position:absolute;left:-5%;width:110%;height:110px;border-radius:50% 50% 0 0/100% 100% 0 0}
+.wave.a{bottom:-62px;background:#d8ecfb;transform:rotate(-2deg);animation:wave 10s ease-in-out infinite alternate}
+.wave.b{bottom:-83px;background:#8fc6f2;transform:rotate(2deg);animation:wave 13s ease-in-out infinite alternate-reverse}
+.wave.c{bottom:-103px;background:#1e5fa8;transform:rotate(-1deg);animation:wave 16s ease-in-out infinite alternate}
+@keyframes wave{from{transform:translateX(-2%) rotate(-2deg)}to{transform:translateX(2%) rotate(2deg)}}
+
+header{
+  width:min(1200px,94vw);margin:24px auto 18px;
+  display:flex;align-items:center;justify-content:space-between;gap:24px;
+  padding:18px 24px;background:rgba(255,255,255,.86);
+  border:1px solid rgba(29,99,182,.15);border-radius:28px;
+  box-shadow:var(--sombra);backdrop-filter:blur(10px)
+}
+.brand{display:flex;align-items:center;gap:18px}
+.logo{width:105px;height:105px;object-fit:cover;border-radius:50%;filter:drop-shadow(0 7px 12px rgba(7,27,70,.15))}
+.kicker{font-size:14px;letter-spacing:3px;font-weight:800;text-transform:uppercase;color:var(--azul3)}
+h1{margin:4px 0 0;font-size:clamp(28px,4vw,52px);line-height:.95;letter-spacing:-2px}
+.script{font-family:"Brush Script MT","Segoe Script",cursive;font-weight:700;font-size:clamp(25px,3vw,40px);color:var(--azul2)}
+.tagline{font-size:13px;color:#48658b;text-align:right;line-height:1.45}
+
+main{width:min(1200px,94vw);margin:0 auto 180px}
+.hero{
+  text-align:center;padding:22px 10px 10px;
+}
+.hero .eyebrow{
+  display:inline-block;padding:9px 18px;border-radius:999px;
+  background:var(--celeste2);color:var(--azul2);font-weight:800;letter-spacing:1.2px
+}
+.hero h2{margin:14px 0 8px;font-size:clamp(38px,6vw,74px);letter-spacing:-3px}
+.hero p{margin:0 auto;color:#4d6788;max-width:700px;font-size:16px}
+
+.switcher{display:flex;justify-content:center;gap:10px;margin:28px 0 25px;flex-wrap:wrap}
+.tab{
+  border:0;padding:13px 24px;border-radius:999px;cursor:pointer;
+  background:#dbeeff;color:var(--azul);font-weight:900;font-size:15px;
+  transition:.25s;box-shadow:inset 0 0 0 1px rgba(29,99,182,.12)
+}
+.tab:hover{transform:translateY(-2px)}
+.tab.active{background:var(--azul2);color:white;box-shadow:0 12px 25px rgba(12,63,145,.25)}
+
+.tanda{display:none;animation:appear .5s ease}
+.tanda.active{display:block}
+@keyframes appear{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+.tanda-head{
+  display:flex;align-items:end;justify-content:space-between;gap:15px;margin:0 0 18px;
+}
+.tanda-title{
+  margin:0;font-size:clamp(35px,5vw,60px);letter-spacing:-3px;
+  color:var(--azul)
+}
+.tanda-title span{color:var(--azul3)}
+.count{
+  background:white;border:1px solid #cfe5f8;border-radius:18px;padding:10px 15px;
+  color:#58708f;font-size:13px;font-weight:800
+}
+
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
+.card{
+  position:relative;overflow:hidden;min-height:150px;padding:19px;
+  background:rgba(255,255,255,.92);border:1px solid #d7e9f8;border-radius:22px;
+  box-shadow:0 10px 30px rgba(7,27,70,.08);cursor:pointer;
+  transition:transform .25s,box-shadow .25s,border-color .25s
+}
+.card:before{
+  content:"";position:absolute;inset:auto -30px -60px auto;width:130px;height:130px;
+  border-radius:50%;background:#e6f4ff;transition:.3s
+}
+.card:hover{transform:translateY(-7px);box-shadow:0 18px 38px rgba(7,27,70,.16);border-color:#9ccbf1}
+.card.active{border-color:#2b73c1;box-shadow:0 0 0 3px rgba(43,115,193,.12),0 18px 42px rgba(7,27,70,.18)}
+.num{
+  position:relative;z-index:1;width:40px;height:40px;border-radius:50%;
+  display:grid;place-items:center;background:var(--azul);color:white;font-weight:900;
+  font-size:14px
+}
+.course{position:relative;z-index:1;margin-top:18px;font-size:31px;font-weight:900;letter-spacing:-1px}
+.teacher,.dance{position:relative;z-index:1;margin-top:7px;font-size:14px;font-weight:700;color:#48658b}.dance{margin-top:3px;color:#1d63b6}
+.sub{position:relative;z-index:1;margin-top:4px;color:#5f7693;font-size:12px;text-transform:uppercase;letter-spacing:1.2px;font-weight:800}
+.card .spark{position:absolute;right:17px;top:17px;color:#1d63b6;font-size:18px;animation:twinkle 1.8s infinite}
+@keyframes twinkle{50%{transform:scale(1.25) rotate(12deg);opacity:.45}}
+
+.stage{
+  margin:40px 0 0;position:relative;min-height:235px;border-radius:32px;
+  background:linear-gradient(145deg,#fafdff,#dff1ff);
+  border:1px solid #c6e1f5;overflow:hidden;box-shadow:var(--sombra)
+}
+.stage:before{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 20%,rgba(255,255,255,.9),transparent 42%);
+}
+.stage-label{position:absolute;top:20px;left:25px;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:900;color:#5c7594}
+.notes{position:absolute;inset:0;pointer-events:none}
+.note{position:absolute;color:#1d63b6;font-size:30px;animation:float 4.8s ease-in-out infinite}
+.n1{left:16%;top:45px}.n2{left:29%;top:105px;animation-delay:1s}.n3{right:28%;top:55px;animation-delay:2s}.n4{right:14%;top:115px;animation-delay:.5s}
+@keyframes float{0%,100%{transform:translateY(8px) rotate(-8deg);opacity:.55}50%{transform:translateY(-16px) rotate(10deg);opacity:1}}
+
+.dancer{position:absolute;bottom:-8px;filter:drop-shadow(0 12px 8px rgba(7,27,70,.16));transform-origin:50% 90%}
+.woman{left:7%;width:150px;height:190px;animation:sway 3.2s ease-in-out infinite}
+.man{right:8%;width:145px;height:195px;animation:sway2 3.7s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(3deg) translateY(-4px)}}
+@keyframes sway2{0%,100%{transform:rotate(2deg)}50%{transform:rotate(-3deg) translateY(-5px)}}
+.dancer svg{width:100%;height:100%}
+.stage-center{text-align:center;position:absolute;left:50%;top:55%;transform:translate(-50%,-50%);width:45%;z-index:2}
+.stage-center strong{font-size:clamp(17px,2.4vw,27px)}
+.stage-center small{display:block;margin-top:7px;color:#5d7695}
+.pulse{
+  display:inline-block;margin-top:15px;padding:9px 15px;border-radius:999px;
+  background:var(--azul2);color:#fff;font-size:12px;font-weight:900;
+  animation:pulse 2s infinite
+}
+@keyframes pulse{50%{box-shadow:0 0 0 9px rgba(12,63,145,.08)}}
+
+footer{
+  width:min(1200px,94vw);margin:0 auto 25px;text-align:center;
+  color:#56708f;font-size:13px
+}
+footer strong{color:var(--azul)}
+
+@media(max-width:850px){
+  header{padding:15px}.tagline{display:none}.logo{width:80px;height:80px}
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .stage{min-height:220px}.woman{left:1%}.man{right:1%}
+  .stage-center{width:52%}
+}
+@media(max-width:520px){
+  header{border-radius:20px}.brand{gap:10px}.logo{width:65px;height:65px}
+  .kicker{font-size:10px;letter-spacing:2px}h1{font-size:28px}
+  .grid{grid-template-columns:1fr 1fr;gap:10px}.card{min-height:135px;padding:14px;border-radius:17px}
+  .course{font-size:27px}.num{width:34px;height:34px}
+  .stage{min-height:205px}.woman{width:110px;height:150px;left:-8px}.man{width:105px;height:155px;right:-8px}
+  .stage-center{width:60%}.stage-center strong{font-size:15px}.stage-center small{font-size:11px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <img class="logo" src="logo.png">
+    <div>
+      <div class="kicker">Liceo Bicentenario Politécnico Cesáreo Aguirre Goyenechea</div>
+      <h1><span class="script">Arte · Cultura · Identidad</span></h1>
+    </div>
+  </div>
+  
+</header>
+
+<main>
+  <section class="hero">
+    <div class="eyebrow">CRONOGRAMA DE PRESENTACIONES</div>
+    <h2>Una gala para <span style="color:#1d63b6">celebrar nuestras raíces</span></h2>
+    <p>Selecciona una tanda para conocer el orden de presentación de nuestros cursos.</p>
+  </section>
+
+  <div class="switcher">
+    <button class="tab active" data-tanda="primera">Primera Tanda · 16 cursos</button>
+    <button class="tab" data-tanda="segunda">Segunda Tanda · 15 cursos</button>
+  </div>
+
+  <section class="tanda active" id="primera">
+    <div class="tanda-head">
+      <h3 class="tanda-title">Primera <span>Tanda</span></h3>
+      <div class="count">16 presentaciones</div>
+    </div>
+    <div class="grid" id="grid1"></div>
+  </section>
+
+  <section class="tanda" id="segunda">
+    <div class="tanda-head">
+      <h3 class="tanda-title">Segunda <span>Tanda</span></h3>
+      <div class="count">15 presentaciones</div>
+    </div>
+    <div class="grid" id="grid2"></div>
+  </section>
+
+  <section class="stage" aria-label="Escenario animado">
+    <div class="stage-label">Escenario · Gala</div>
+    <div class="notes">
+      <div class="note n1">♪</div><div class="note n2">♫</div>
+      <div class="note n3">♪</div><div class="note n4">♫</div>
+    </div>
+
+    <!-- Silueta femenina estilizada inspirada en la gráfica original -->
+    <div class="dancer woman">
+      <svg viewBox="0 0 150 190" aria-hidden="true">
+        <g fill="#071b46">
+          <circle cx="78" cy="40" r="13"/>
+          <path d="M74 53 C63 56 59 68 61 82 L54 98 C50 111 42 125 24 138
+                   C43 154 67 160 98 151 C113 146 126 139 136 128
+                   C115 119 105 106 99 91 L91 66 C88 57 83 54 74 53Z"/>
+          <path d="M63 61 C49 57 38 45 30 29 L25 16 L34 14 C41 32 50 42 67 48Z"/>
+          <path d="M24 17 L14 11 L9 18 L21 25Z"/>
+          <path d="M65 63 C55 75 51 88 45 100 L53 105 C63 93 70 80 74 69Z"/>
+          <path d="M95 86 C111 84 123 88 132 99 L127 106 C116 99 108 98 98 99Z"/>
+          <path d="M65 148 L58 181 L70 181 L79 150Z"/>
+          <path d="M88 149 L94 181 L107 181 L100 145Z"/>
+          <path d="M54 180 L43 186 L71 187 L70 180Z"/>
+          <path d="M95 180 L86 187 L112 187 L106 180Z"/>
+        </g>
+      </svg>
+    </div>
+
+    <!-- Silueta masculina estilizada inspirada en la gráfica original -->
+    <div class="dancer man">
+      <svg viewBox="0 0 145 195" aria-hidden="true">
+        <g fill="#071b46">
+          <path d="M47 29 H98 L91 20 H53Z"/>
+          <path d="M55 17 H91 L84 9 H62Z"/>
+          <circle cx="74" cy="40" r="12"/>
+          <path d="M59 51 C49 59 49 77 56 92 L65 108 L49 139
+                   L65 149 L80 116 L96 146 L109 138 L93 99
+                   C99 82 98 65 88 54 C80 48 68 48 59 51Z"/>
+          <path d="M59 58 C45 55 33 45 24 30 L17 17 L25 13 C34 30 45 42 63 46Z"/>
+          <path d="M18 18 L7 12 L4 20 L16 27Z"/>
+          <path d="M78 110 L96 143 L113 166 L103 173 L84 153 L67 125Z"/>
+          <path d="M55 111 L48 145 L38 170 L25 166 L36 138 L42 105Z"/>
+          <path d="M101 169 L114 172 L108 180 L95 176Z"/>
+          <path d="M24 164 L38 168 L31 177 L17 171Z"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="stage-center">
+      <strong id="stageText">Selecciona un curso para destacar su presentación</strong>
+      <small id="stageSub">La tarjeta seleccionada aparecerá iluminada.</small>
+      <span class="pulse">♪ ¡Que comience la gala! ♪</span>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <strong>Arte · Cultura · Identidad</strong> · Liceo Bicentenario Politécnico Cesáreo Aguirre Goyenechea
+</footer>
+
+<script>
+// EDITA AQUÍ el profesor y la danza de cada curso.
+const primera = [
+ {curso:"2°C",profesor:"María Teresa Pacheco",danza:"Pascuense, Chile"},{curso:"1°C",profesor:"Felipe Varas",danza:"Chamamé, Chile"},{curso:"1°D",profesor:"Alejandra Cautín ",danza:"La Resbalosa, Chile"},{curso:"1°E",profesor:"Alex Leiva ",danza:"Chacarera, Argentina"},
+ {curso:"1°F",profesor:"Verónica Carrillo",danza:"Polka, Chile"},{curso:"1°G",profesor:"Felipe Cabrera",danza:"La Tejedora, Chile"},{curso:"1°H",profesor:"María Pastén Bela",danza:"Minga Chiloé, Chile "},{curso:"1°A",profesor:"Mirka Araya",danza:"Cumbia Colombiana, Colombia"},
+ {curso:"1°B",profesor:"Raúl Jarpa",danza:"Tao Tao, México"},{curso:"2°D",profesor:"Michel Segura ",danza:"Destreza de cueca, Chile"},{curso:"2°B",profesor:"Jonathan López",danza:"Cacharpaya, Chile"},{curso:"2°E",profesor:"María Patricia Riquelme",danza:"Destreza de cueca, Chile"},
+ {curso:"2°F",profesor:"Karen Valdivia",danza:"Lambada, Brasil"},{curso:"2°A",profesor:"Constanza Álvarez",danza:"Merengue Farolito, República dominicana "},{curso:"2°G",profesor:"Andrea Godoy",danza:"Mambo Cuba, Cuba"},{curso:"2°H",profesor:"Jazmín Fernández",danza:"Samba, Brasil "}
+];
+const segunda = [
+ {curso:"3°H",profesor:"Paola Andrade",danza:"Tumbe Carnaval"},{curso:"3°A",profesor:"Juan Quiroga ",danza:"Jarabe Tapatío, México"},{curso:"3°B",profesor:"Leonardo Pérez",danza:"Cumbia Colombia, Colombia"},{curso:"3°C",profesor:"Rosario Espinoza",danza:"Osada, Bolivia"},
+ {curso:"3°E",profesor:"Gabriela Yáñez",danza:"Morenada, Bolivia"},{curso:"3°F",profesor:"Luis Marcoleta",danza:"Festejo Peruano, Perú"},{curso:"3°D",profesor:"Yan Durán",danza:"Caporal, Bolivia"},{curso:"3°G",profesor:"Magly Alejos",danza:"Tambor Venezolano, Venezuela"},
+ {curso:"4°B",profesor:"Rose Villca",danza:"Pascuense, Chile"},{curso:"4°E",profesor:"Cristopher Pizarro",danza:"Tobas, Bolivia"},{curso:"4°D",profesor:"Roberto Oyarce ",danza:"Caporal, Bolivia"},{curso:"4°G",profesor:"Marisol Alba",danza:"Diablada, Bolivia"},
+ {curso:"4°A",profesor:"Catalina Honores",danza:"Tobas, Bolivia"},{curso:"4°C",profesor:"César Larama",danza:"Morenada, Bolivia"},{curso:"4°F",profesor:"Catherine Humire",danza:"Diablada, Bolivia"}
+];
+
+function render(list, id){
+  const grid=document.getElementById(id);
+  grid.innerHTML=list.map((item,i)=>`
+    <article class="card" tabindex="0" data-course="${item.curso}" data-number="${i+1}">
+      <div class="num">${i+1}</div>
+      <div class="course">${item.curso}</div>
+      <div class="teacher">Profesor/a: ${item.profesor || ""}</div>
+      <div class="dance">Danza: ${item.danza || "_______________"}</div>
+      <div class="sub">Presentación · Gala</div>
+      <div class="spark">✦</div>
+    </article>
+  `).join("");
+}
+render(primera,"grid1"); render(segunda,"grid2");
+
+document.querySelectorAll(".tab").forEach(tab=>{
+  tab.addEventListener("click",()=>{
+    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+    document.querySelectorAll(".tanda").forEach(t=>t.classList.remove("active"));
+    tab.classList.add("active");
+    document.getElementById(tab.dataset.tanda).classList.add("active");
+  });
+});
+
+function selectCard(card){
+  document.querySelectorAll(".card").forEach(c=>c.classList.remove("active"));
+  card.classList.add("active");
+  document.getElementById("stageText").textContent =
+    `Presentación Nº ${card.dataset.number} · Curso ${card.dataset.course}`;
+  document.getElementById("stageSub").textContent =
+    "Preparando el escenario… ¡mucha energía y tradición!";
+}
+document.addEventListener("click",e=>{
+  const card=e.target.closest(".card");
+  if(card) selectCard(card);
+});
+document.addEventListener("keydown",e=>{
+  if((e.key==="Enter" || e.key===" ") && document.activeElement.classList.contains("card")){
+    e.preventDefault(); selectCard(document.activeElement);
+  }
+});
+</script>
+
+<div class="waves"><div class="wave a"></div><div class="wave b"></div><div class="wave c"></div></div>
+</body>
+</html>
