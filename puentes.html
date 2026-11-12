@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Programa PUENTES · Nivelación de Aprendizajes</title>
+<meta name="description" content="Programa PUENTES: nivelación intercultural en Lenguaje y Matemática para estudiantes de 1.º y 2.º medio del Liceo Cesáreo Aguirre Goyenechea, Calama.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#14245a; --navy-2:#1d3378; --blue:#2f7fd6; --sky:#e8f2fc;
+    --sun:#f5b915; --sun-soft:#fff4d1; --red:#d9352b;
+    --ink:#1a2240; --muted:#5a6280; --line:#e3e7f0; --bg:#fbfaf6; --white:#fff;
+    --r:18px; --max:1160px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:"Nunito Sans",system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.65;font-size:17px}
+  img{max-width:100%;display:block}
+  a{color:inherit}
+  h1,h2,h3{font-family:"Fredoka",system-ui,sans-serif;line-height:1.15;color:var(--navy)}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+  section{padding:96px 0}
+  .eyebrow{display:inline-block;font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin-bottom:12px}
+  .title{font-size:clamp(30px,4vw,44px);margin-bottom:18px}
+  .lead{font-size:19px;color:var(--muted);max-width:680px}
+
+  /* NAV */
+  header.nav{position:fixed;inset:0 0 auto 0;z-index:50;transition:background .3s,box-shadow .3s}
+  header.nav.solid{background:rgba(255,255,255,.96);box-shadow:0 2px 18px rgba(20,36,90,.08);backdrop-filter:blur(8px)}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;height:74px}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+  .brand img{height:52px;width:auto;background:#fff;border-radius:10px;padding:2px 4px}
+  .brand span{font-family:"Fredoka",system-ui,sans-serif;font-weight:700;font-size:22px;color:#fff;letter-spacing:.02em}
+  .solid .brand span{color:var(--navy)}
+  .menu{display:flex;gap:28px;list-style:none}
+  .menu a{text-decoration:none;font-weight:700;font-size:15px;color:#fff;opacity:.92}
+  .solid .menu a{color:var(--navy)}
+  .menu a:hover{opacity:1;color:var(--sun)}
+  .burger{display:none;background:none;border:0;cursor:pointer;width:44px;height:44px}
+  .burger span{display:block;width:24px;height:2.5px;background:#fff;margin:5px auto;border-radius:2px}
+  .solid .burger span{background:var(--navy)}
+
+  /* HERO */
+  .hero{position:relative;min-height:min(100vh,900px);display:grid;grid-template-columns:44% 56%;padding:0;color:#fff;background:var(--navy);overflow:hidden}
+  .hero-text{display:flex;flex-direction:column;justify-content:center;padding:120px 48px 90px max(24px,calc((100vw - var(--max))/2 + 24px));position:relative;z-index:2;
+    background:radial-gradient(circle at 10% 90%,rgba(47,127,214,.35),transparent 55%),var(--navy)}
+  .hero-img{position:relative;background:url(img/equipo.jpg) 50% 35%/cover no-repeat}
+  .hero-img::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--navy) 0%,rgba(20,36,90,0) 22%),linear-gradient(180deg,rgba(20,36,90,.45) 0%,rgba(20,36,90,0) 18%)}
+  .hero .tag{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;background:var(--sun);color:var(--navy);font-weight:700;font-size:14px;padding:7px 16px;border-radius:99px;margin-bottom:22px}
+  .hero h1{color:#fff;font-size:clamp(44px,5.6vw,84px);letter-spacing:.01em}
+  .hero h1 em{font-style:normal;color:var(--sun);display:block}
+  .hero p{font-size:clamp(17px,1.6vw,20px);max-width:520px;margin:16px 0 32px;opacity:.92}
+  .btns{display:flex;gap:14px;flex-wrap:wrap}
+  .btn{display:inline-block;text-decoration:none;font-weight:700;padding:14px 26px;border-radius:99px;transition:transform .2s,box-shadow .2s}
+  .btn:hover{transform:translateY(-2px)}
+  .btn-sun{background:var(--sun);color:var(--navy);box-shadow:0 8px 24px rgba(245,185,21,.35)}
+  .btn-ghost{border:2px solid rgba(255,255,255,.7);color:#fff}
+  .bridge{position:absolute;left:0;right:0;bottom:-1px;z-index:3;height:40px;color:var(--bg)}
+
+  /* QUIÉNES SOMOS */
+  .about{display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center}
+  .about p{margin-bottom:16px;color:#384063}
+  .about-img{position:relative}
+  .about-img img{border-radius:var(--r);box-shadow:0 24px 50px rgba(20,36,90,.18);aspect-ratio:1/1;object-fit:cover}
+  .about-img::before{content:"";position:absolute;inset:-14px 14px 14px -14px;border:3px solid var(--sun);border-radius:var(--r);z-index:-1}
+  .facts{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:28px}
+  .fact{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px}
+  .fact b{display:block;font-family:"Fredoka",system-ui,sans-serif;font-size:26px;color:var(--navy)}
+  .fact span{font-size:14px;color:var(--muted);line-height:1.4;display:block}
+  .principle{margin-top:24px;background:var(--sun-soft);border-left:5px solid var(--sun);padding:18px 20px;border-radius:0 12px 12px 0;font-size:16px}
+  .principle strong{color:var(--navy)}
+
+  /* MISIÓN VISIÓN */
+  .mv{background:var(--navy);color:#fff;position:relative;overflow:hidden}
+  .mv .title,.mv h3{color:#fff}
+  .mv .eyebrow{color:var(--sun)}
+  .mv-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:40px}
+  .mv-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:var(--r);padding:36px}
+  .mv-card .ic{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;margin-bottom:18px}
+  .mv-card h3{font-size:30px;margin-bottom:12px}
+  .mv-card p{opacity:.9;font-size:18px}
+  .values{display:flex;flex-wrap:wrap;gap:10px;margin-top:36px}
+  .values span{background:rgba(255,255,255,.1);border-radius:99px;padding:8px 18px;font-weight:600;font-size:15px}
+  .purpose{margin-top:44px;text-align:center;font-family:"Fredoka",system-ui,sans-serif;font-weight:500;font-size:clamp(20px,2.4vw,26px);max-width:860px;margin-left:auto;margin-right:auto;line-height:1.4;color:#dfe8ff}
+  .purpose b{color:var(--sun);font-weight:600}
+
+  /* MODELO */
+  .head-c{text-align:center;max-width:760px;margin:0 auto 48px}
+  .head-c .lead{margin:0 auto}
+  .model{display:grid;grid-template-columns:repeat(5,1fr);gap:18px}
+  .comp{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:26px 22px;position:relative;transition:transform .25s,box-shadow .25s}
+  .comp:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(20,36,90,.10)}
+  .comp .n{font-family:"Fredoka",system-ui,sans-serif;font-weight:700;font-size:15px;color:#fff;background:var(--blue);width:34px;height:34px;border-radius:50%;display:grid;place-items:center;margin-bottom:16px}
+  .comp:nth-child(2) .n{background:var(--red)} .comp:nth-child(3) .n{background:var(--sun);color:var(--navy)}
+  .comp:nth-child(4) .n{background:var(--navy)} .comp:nth-child(5) .n{background:#2a9d6f}
+  .comp h3{font-size:20px;margin-bottom:8px}
+  .comp p{font-size:15px;color:var(--muted);line-height:1.55}
+  .comp small{display:block;margin-top:12px;font-weight:700;font-size:13px;color:var(--blue)}
+
+  /* METAS */
+  .goals{background:var(--sky)}
+  .goal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+  .goal{background:#fff;border-radius:var(--r);padding:30px 24px;text-align:center;box-shadow:0 6px 20px rgba(20,36,90,.06)}
+  .goal b{font-family:"Fredoka",system-ui,sans-serif;font-size:52px;color:var(--navy);display:block;line-height:1}
+  .goal b i{font-style:normal;color:var(--sun)}
+  .goal span{display:block;margin-top:10px;color:var(--muted);font-size:15px;line-height:1.45}
+
+  /* GALERÍA */
+  .gallery{display:grid;grid-template-columns:repeat(6,1fr);grid-auto-rows:200px;gap:14px}
+  .g{position:relative;overflow:hidden;border-radius:14px;cursor:zoom-in;border:0;padding:0;background:#ddd}
+  .g img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+  .g:hover img{transform:scale(1.06)}
+  .g figcaption{position:absolute;left:0;right:0;bottom:0;padding:28px 16px 12px;color:#fff;font-weight:700;font-size:15px;text-align:left;background:linear-gradient(transparent,rgba(10,20,50,.8))}
+  .g1{grid-column:span 4;grid-row:span 2} .g2{grid-column:span 2;grid-row:span 2}
+  .g3{grid-column:span 2;grid-row:span 2} .g4{grid-column:span 2;grid-row:span 2} .g5{grid-column:span 2;grid-row:span 2}
+  .lb{position:fixed;inset:0;background:rgba(8,14,36,.94);z-index:100;display:none;align-items:center;justify-content:center;padding:30px}
+  .lb.open{display:flex}
+  .lb img{max-height:84vh;max-width:92vw;border-radius:10px}
+  .lb p{position:absolute;bottom:22px;left:0;right:0;text-align:center;color:#fff;font-weight:600}
+  .lb button{position:absolute;background:rgba(255,255,255,.12);border:0;color:#fff;font-size:28px;width:52px;height:52px;border-radius:50%;cursor:pointer}
+  .lb .x{top:20px;right:20px} .lb .prev{left:20px;top:50%} .lb .next{right:20px;top:50%}
+
+  /* EQUIPO */
+  .team{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+  .member{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:32px 22px;text-align:center}
+  .avatar{width:96px;height:96px;border-radius:50%;margin:0 auto 18px;display:grid;place-items:center;font-family:"Fredoka",system-ui,sans-serif;font-weight:700;font-size:34px;color:#fff;background:linear-gradient(135deg,var(--navy-2),var(--blue));box-shadow:0 0 0 5px var(--sun-soft)}
+  .member:nth-child(2) .avatar{background:linear-gradient(135deg,#b8261d,var(--red))}
+  .member:nth-child(3) .avatar{background:linear-gradient(135deg,#e09e00,var(--sun));color:var(--navy)}
+  .member:nth-child(4) .avatar{background:linear-gradient(135deg,#1f7a56,#2a9d6f)}
+  .member h3{font-size:21px}
+  .member p{color:var(--muted);font-size:14px;margin-top:4px}
+  .team-note{text-align:center;margin-top:34px;color:var(--muted)}
+
+  /* FOOTER */
+  footer{background:var(--navy);color:#cdd6f0;padding:60px 0 30px}
+  .f-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:40px}
+  footer img{height:90px;width:auto;background:#fff;border-radius:12px;padding:4px 8px;margin-bottom:14px}
+  footer h4{font-family:"Fredoka",system-ui,sans-serif;color:#fff;font-size:18px;margin-bottom:12px}
+  footer ul{list-style:none} footer li{margin-bottom:6px;font-size:15px}
+  footer a{text-decoration:none} footer a:hover{color:var(--sun)}
+  .copy{border-top:1px solid rgba(255,255,255,.12);margin-top:40px;padding-top:22px;font-size:14px;text-align:center;opacity:.75}
+
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s,transform .7s}
+  .reveal.in{opacity:1;transform:none}
+
+  @media (max-width:1000px){
+    .model{grid-template-columns:repeat(2,1fr)} .comp:last-child{grid-column:span 2}
+    .goal-grid,.team{grid-template-columns:repeat(2,1fr)}
+  }
+  @media (max-width:820px){
+    section{padding:72px 0}
+    .menu{position:fixed;top:74px;left:0;right:0;flex-direction:column;gap:0;background:#fff;box-shadow:0 10px 24px rgba(0,0,0,.1);display:none}
+    .menu.open{display:flex}
+    .menu a{display:block;padding:14px 24px;color:var(--navy)!important;border-top:1px solid var(--line)}
+    .burger{display:block}
+    .about,.mv-grid,.f-grid{grid-template-columns:1fr}
+    .about{gap:40px}
+    .gallery{grid-template-columns:1fr 1fr;grid-auto-rows:180px}
+    .g1{grid-column:span 2} .g2,.g3,.g4,.g5{grid-column:span 1}
+    .hero{grid-template-columns:1fr;min-height:0}
+    .hero-img{order:-1;height:62vw;min-height:300px;margin-top:74px}
+    .hero-img::before{background:linear-gradient(0deg,var(--navy) 0%,rgba(20,36,90,0) 30%)}
+    .hero-text{padding:28px 24px 80px}
+    .hero .tag{font-size:12px}
+    .hero .menu a{color:var(--navy)}
+  }
+  @media (max-width:520px){
+    .model,.goal-grid,.team{grid-template-columns:1fr} .comp:last-child{grid-column:auto}
+    .facts{grid-template-columns:1fr}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}.reveal{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <a href="#inicio" class="brand"><img src="img/logo.png" alt="Logo Programa PUENTES"><span>PUENTES</span></a>
+    <button class="burger" id="burger" aria-label="Abrir menú"><span></span><span></span><span></span></button>
+    <ul class="menu" id="menu">
+      <li><a href="#quienes-somos">Quiénes somos</a></li>
+      <li><a href="#mision-vision">Misión y visión</a></li>
+      <li><a href="#modelo">Modelo</a></li>
+      <li><a href="#galeria">Galería</a></li>
+      <li><a href="#equipo">Nuestro equipo</a></li>
+    </ul>
+  </div>
+</header>
+
+<!-- PORTADA -->
+<section class="hero" id="inicio">
+  <div class="hero-text">
+    <span class="tag">★ Liceo Cesáreo Aguirre Goyenechea · Calama</span>
+    <h1>Programa <em>PUENTES</em></h1>
+    <p>Nivelación de aprendizajes en Lenguaje y Matemática para estudiantes de 1.º y 2.º medio. Construyendo juntos nuevas oportunidades.</p>
+    <div class="btns">
+      <a href="#quienes-somos" class="btn btn-sun">Conoce el programa</a>
+      <a href="#equipo" class="btn btn-ghost">Nuestro equipo</a>
+    </div>
+  </div>
+  <div class="hero-img" role="img" aria-label="Equipo PUENTES con poleras negras del programa"></div>
+  <svg class="bridge" viewBox="0 0 1440 40" preserveAspectRatio="none" aria-hidden="true"><path fill="currentColor" d="M0 40V22C240 2 480 0 720 0s480 2 720 22v18z"/></svg>
+</section>
+
+<!-- QUIÉNES SOMOS -->
+<section id="quienes-somos">
+  <div class="wrap about">
+    <div class="reveal">
+      <span class="eyebrow">Quiénes somos</span>
+      <h2 class="title">Un puente para aprender, participar y progresar</h2>
+      <p>PUENTES es un programa de nivelación intercultural del Liceo Cesáreo Aguirre Goyenechea de Calama, dirigido a estudiantes extranjeros de 1.º y 2.º medio que presentan rezago en Lectura y Matemática.</p>
+      <p>Trabajamos con tres palancas: un <strong>diagnóstico integral</strong> que distingue la brecha académica de la barrera lingüística y de la trayectoria escolar; una <strong>enseñanza activa</strong> por estaciones y proyectos reales; y el <strong>uso ético de la inteligencia artificial</strong> como apoyo al docente, para preparar materiales diferenciados y entregar retroalimentación oportuna.</p>
+      <div class="facts">
+        <div class="fact"><b>1.º y 2.º</b><span>año de Enseñanza Media</span></div>
+        <div class="fact"><b>2</b><span>asignaturas: Lenguaje y Matemática</span></div>
+        <div class="fact"><b>12</b><span>meses de acompañamiento en 2027</span></div>
+      </div>
+      <div class="principle"><strong>Nuestro principio:</strong> la condición de extranjero no es un diagnóstico. Atendemos brechas y eliminamos barreras; no etiquetamos.</div>
+    </div>
+    <div class="about-img reveal">
+      <img src="img/estudiantes.jpg" alt="Estudiantes del liceo sonriendo mientras trabajan juntos">
+    </div>
+  </div>
+</section>
+
+<!-- MISIÓN Y VISIÓN -->
+<section class="mv" id="mision-vision">
+  <div class="wrap">
+    <span class="eyebrow">Misión y visión</span>
+    <h2 class="title">Hacia dónde vamos</h2>
+    <div class="mv-grid">
+      <article class="mv-card reveal">
+        <div class="ic" style="background:var(--sun)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#14245a" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="#14245a"/></svg></div>
+        <h3>Misión</h3>
+        <p>Nivelar los aprendizajes en Lenguaje y Matemática de los estudiantes extranjeros de 1.º y 2.º medio mediante diagnóstico preciso, enseñanza diferenciada y activa, retroalimentación oportuna y el uso ético de la inteligencia artificial como apoyo a la labor docente, para que cada estudiante avance desde su propio punto de partida.</p>
+      </article>
+      <article class="mv-card reveal">
+        <div class="ic" style="background:var(--blue)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></div>
+        <h3>Visión</h3>
+        <p>Ser un modelo de inclusión intercultural en la educación pública, en el que cada estudiante que llega desde otro país encuentre en el liceo un puente y no una barrera, y en el que su diversidad sea reconocida como un aporte para toda la comunidad escolar.</p>
+      </article>
+    </div>
+    <div class="values reveal">
+      <span>Inclusión</span><span>Interculturalidad</span><span>Equidad</span><span>Colaboración</span><span>Uso ético de la IA</span><span>Mejora continua</span>
+    </div>
+    <p class="purpose reveal">«Que cada estudiante <b>aprenda, participe y progrese</b> desde su propio punto de partida.»</p>
+  </div>
+</section>
+
+<!-- MODELO -->
+<section id="modelo">
+  <div class="wrap">
+    <div class="head-c reveal">
+      <span class="eyebrow">Cómo trabajamos</span>
+      <h2 class="title">El modelo PUENTES</h2>
+      <p class="lead">Cinco componentes que cambian la forma de enseñar, monitorear y retroalimentar, en coherencia con el Marco para la Buena Enseñanza.</p>
+    </div>
+    <div class="model">
+      <div class="comp reveal"><div class="n">1</div><h3>Estaciones de aprendizaje</h3><p>Rotación en tres estaciones: instrucción en grupo pequeño, práctica diferenciada y trabajo colaborativo o autónomo.</p><small>2 h semanales por asignatura</small></div>
+      <div class="comp reveal"><div class="n">2</div><h3>Laboratorio de desafíos reales</h3><p>Proyectos Lenguaje–Matemática como «Mi barrio en datos» y «Voces que cruzan fronteras».</p><small>Dos proyectos de seis semanas</small></div>
+      <div class="comp reveal"><div class="n">3</div><h3>Español académico</h3><p>Glosarios bilingües, lectura funcional y producción guiada para fortalecer el vocabulario disciplinar.</p><small>1 h semanal</small></div>
+      <div class="comp reveal"><div class="n">4</div><h3>Duplas Puente</h3><p>Tutoría entre pares: estudiantes de cursos superiores acompañan a un compañero o compañera.</p><small>1 sesión semanal de 30 min</small></div>
+      <div class="comp reveal"><div class="n">5</div><h3>Portafolio de progreso</h3><p>Versión inicial, retroalimentación, versión mejorada y autoevaluación: el avance se ve, no solo la nota.</p><small>Actualización quincenal</small></div>
+    </div>
+  </div>
+</section>
+
+<!-- METAS -->
+<section class="goals">
+  <div class="wrap">
+    <div class="head-c reveal">
+      <span class="eyebrow">Metas 2027</span>
+      <h2 class="title">Lo que nos proponemos lograr</h2>
+    </div>
+    <div class="goal-grid">
+      <div class="goal reveal"><b>70<i>%</i></b><span>de los participantes sube al menos un nivel de logro</span></div>
+      <div class="goal reveal"><b>90<i>%</i></b><span>de promoción de los estudiantes focalizados</span></div>
+      <div class="goal reveal"><b>80<i>%</i></b><span>recibe retroalimentación al menos cada 15 días</span></div>
+      <div class="goal reveal"><b>30<i>%</i></b><span>menos tiempo docente en preparar material diferenciado</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- GALERÍA -->
+<section id="galeria">
+  <div class="wrap">
+    <div class="head-c reveal">
+      <span class="eyebrow">Galería</span>
+      <h2 class="title">Momentos PUENTES</h2>
+      <p class="lead">Talleres, salidas pedagógicas y encuentros que construyen comunidad.</p>
+    </div>
+    <div class="gallery">
+      <figure class="g g1" tabindex="0"><img src="img/galeria-1.jpg" alt="Estudiantes junto a su profesor en el liceo" loading="lazy"><figcaption>Compartiendo en el liceo</figcaption></figure>
+      <figure class="g g2" tabindex="0"><img src="img/galeria-2.jpg" alt="Estudiantes reunidos en una jornada informativa" loading="lazy"><figcaption>Jornada con estudiantes</figcaption></figure>
+      <figure class="g g3" tabindex="0"><img src="img/galeria-4.jpg" alt="Grupo de estudiantes y docentes en visita a una universidad" loading="lazy"><figcaption>Visita universitaria</figcaption></figure>
+      <figure class="g g4" tabindex="0"><img src="img/galeria-5.jpg" alt="Estudiantes en salida a terreno junto a un río en el desierto" loading="lazy"><figcaption>Salida a terreno</figcaption></figure>
+      <figure class="g g5" tabindex="0"><img src="img/galeria-3.jpg" alt="Estudiantes disfrazados en celebración de Halloween" loading="lazy"><figcaption>Celebración de Halloween</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- EQUIPO -->
+<section id="equipo" style="background:#fff">
+  <div class="wrap">
+    <div class="head-c reveal">
+      <span class="eyebrow">Nuestro equipo</span>
+      <h2 class="title">Las personas detrás de PUENTES</h2>
+      <p class="lead">Un equipo docente comprometido con que cada estudiante encuentre en el liceo un lugar para aprender y crecer.</p>
+    </div>
+    <div class="team">
+      <div class="member reveal"><div class="avatar">MP</div><h3>María Pastén</h3><p>Equipo PUENTES</p></div>
+      <div class="member reveal"><div class="avatar">NC</div><h3>Nathaly Chávez</h3><p>Equipo PUENTES</p></div>
+      <div class="member reveal"><div class="avatar">AT</div><h3>Alfonso Torres</h3><p>Equipo PUENTES</p></div>
+      <div class="member reveal"><div class="avatar">JM</div><h3>Javier Michaga</h3><p>Equipo PUENTES</p></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="f-grid">
+      <div>
+        <img src="img/logo.png" alt="Logo Programa PUENTES">
+        <p>Nivelación de aprendizajes en Lenguaje y Matemática.<br>Construyendo juntos nuevas oportunidades.</p>
+      </div>
+      <div>
+        <h4>Navegación</h4>
+        <ul>
+          <li><a href="#quienes-somos">Quiénes somos</a></li>
+          <li><a href="#mision-vision">Misión y visión</a></li>
+          <li><a href="#galeria">Galería</a></li>
+          <li><a href="#equipo">Nuestro equipo</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Establecimiento</h4>
+        <ul>
+          <li>Liceo Cesáreo Aguirre Goyenechea</li>
+          <li>RBD 219-4</li>
+          <li>Calama, Región de Antofagasta</li>
+        </ul>
+      </div>
+    </div>
+    <p class="copy">© 2026 Programa PUENTES · Liceo Cesáreo Aguirre Goyenechea</p>
+  </div>
+</footer>
+
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Foto ampliada">
+  <button class="x" aria-label="Cerrar">×</button>
+  <button class="prev" aria-label="Anterior">‹</button>
+  <img id="lb-img" alt="">
+  <button class="next" aria-label="Siguiente">›</button>
+  <p id="lb-cap"></p>
+</div>
+
+<script>
+  const nav=document.getElementById('nav');
+  const onScroll=()=>nav.classList.toggle('solid',window.scrollY>40);
+  window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+
+  const menu=document.getElementById('menu');
+  document.getElementById('burger').addEventListener('click',()=>{menu.classList.toggle('open');nav.classList.add('solid')});
+  menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>menu.classList.remove('open')));
+
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+  const items=[...document.querySelectorAll('.g')];
+  const lb=document.getElementById('lb'),li=document.getElementById('lb-img'),lc=document.getElementById('lb-cap');
+  let cur=0;
+  const show=i=>{cur=(i+items.length)%items.length;const im=items[cur].querySelector('img');li.src=im.src;li.alt=im.alt;lc.textContent=items[cur].querySelector('figcaption').textContent;lb.classList.add('open')};
+  items.forEach((f,i)=>{f.addEventListener('click',()=>show(i));f.addEventListener('keydown',e=>{if(e.key==='Enter')show(i)})});
+  lb.querySelector('.x').onclick=()=>lb.classList.remove('open');
+  lb.querySelector('.prev').onclick=e=>{e.stopPropagation();show(cur-1)};
+  lb.querySelector('.next').onclick=e=>{e.stopPropagation();show(cur+1)};
+  lb.addEventListener('click',e=>{if(e.target===lb)lb.classList.remove('open')});
+  document.addEventListener('keydown',e=>{if(!lb.classList.contains('open'))return;if(e.key==='Escape')lb.classList.remove('open');if(e.key==='ArrowLeft')show(cur-1);if(e.key==='ArrowRight')show(cur+1)});
+</script>
+</body>
+</html>
