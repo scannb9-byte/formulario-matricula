@@ -43,6 +43,11 @@ const CONFIG = {
   EDAD_MIN: 11,
   EDAD_MAX: 25,
   LETRAS: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'], // letras que el personal asigna a cada curso (1° Medio A, B, …)
+  // N° de matrícula: se asigna solo al cambiar el estado a "Matriculado" (si el registro aún no tiene uno).
+  // Formato: AÑO-0001. NRO_MATRICULA_INICIO permite partir desde otro número (ej: 1450 → 2027-1450).
+  NRO_MATRICULA_AUTOMATICO: true,
+  NRO_MATRICULA_DIGITOS: 4,
+  NRO_MATRICULA_INICIO: 1,
   BLOQUEAR_RUN_DUPLICADO: true,       // impide 2 pre-matrículas con el mismo RUN
   FORMULARIO_ABIERTO: true,           // false = cierra el formulario público
 

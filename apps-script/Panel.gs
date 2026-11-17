@@ -59,7 +59,7 @@ function actualizarRegistro(token, num, datos) {
       }
 
       const estado = ESTADOS.indexOf(datos.estado) >= 0 ? datos.estado : actual.estado;
-      const nroMatricula = String(datos.nroMatricula === undefined ? actual.nroMatricula : datos.nroMatricula).trim().slice(0, 20);
+      const nroMatricula = nroMatriculaPara_(sh, estado, datos.nroMatricula === undefined ? actual.nroMatricula : datos.nroMatricula);
       const letra = datos.letra === undefined ? actual.letra : (CONFIG.LETRAS.indexOf(datos.letra) >= 0 ? datos.letra : '');
       const valores = filaDesdeDatos_(v.datos, {
         timestamp: filaActual[0], numRegistro: Number(num), estado: estado, nroMatricula: nroMatricula,
@@ -76,20 +76,56 @@ function actualizarRegistro(token, num, datos) {
   } catch (e) { return errorApi_(e); }
 }
 
+// ------------------------------------------------------------
+// N° de matrícula automático (AÑO-0001)
+// ------------------------------------------------------------
+/** Siguiente N° de matrícula. Llamar SIEMPRE con el bloqueo (LockService) tomado. */
+function siguienteNroMatricula_(sh) {
+  const pref = CONFIG.ANIO + '-';
+  const props = PropertiesService.getScriptProperties();
+  const clave = 'ULTIMO_NRO_MATRICULA_' + CONFIG.ANIO;
+  let max = Math.max(Number(props.getProperty(clave) || 0), (CONFIG.NRO_MATRICULA_INICIO || 1) - 1);
+  const n = sh.getLastRow();
+  if (n > 1) {
+    sh.getRange(2, COLUMNAS.indexOf('nroMatricula') + 1, n - 1, 1).getValues().forEach(r => {
+      const m = new RegExp('^' + CONFIG.ANIO + '-(\\d+)$').exec(String(r[0]).trim());
+      if (m && Number(m[1]) > max) max = Number(m[1]);
+    });
+  }
+  max++;
+  props.setProperty(clave, String(max));
+  return pref + String(max).padStart(CONFIG.NRO_MATRICULA_DIGITOS || 4, '0');
+}
+
+/** Devuelve el N° que corresponde guardar según el estado. */
+function nroMatriculaPara_(sh, estado, nroActual) {
+  nroActual = String(nroActual || '').trim().slice(0, 20);
+  if (nroActual || estado !== 'Matriculado' || !CONFIG.NRO_MATRICULA_AUTOMATICO) return nroActual;
+  return siguienteNroMatricula_(sh);
+}
+
 /** Cambio rápido de estado / N° de matrícula desde la tabla. */
 function cambiarEstado(token, num, estado, nroMatricula) {
   try {
     const ses = requerir_(token, 'editar');
     if (ESTADOS.indexOf(estado) < 0) return { ok: false, mensaje: 'Estado inválido.' };
-    const sh = hojaRegistros_();
-    const fila = filaDeRegistro_(sh, num);
-    if (fila < 0) return { ok: false, mensaje: 'Registro no encontrado.' };
-    const c = COLUMNAS.indexOf('estado') + 1;
+    const lock = LockService.getScriptLock();
+    lock.waitLock(30000);
+    let nro;
     const ahora = new Date();
-    sh.getRange(fila, c, 1, 2).setValues([[estado, String(nroMatricula || '').trim().slice(0, 20)]]);
-    sh.getRange(fila, COLUMNAS.indexOf('fechaModificacion') + 1, 1, 2).setValues([[ahora, ses.usuario]]);
-    bitacora_(ses.usuario, 'Cambiar estado', 'N° ' + num + ' → ' + estado);
-    return { ok: true, fechaModificacion: fmtFecha_(ahora, 'dd/MM/yyyy HH:mm'), modificadoPor: ses.usuario };
+    try {
+      const sh = hojaRegistros_();
+      const fila = filaDeRegistro_(sh, num);
+      if (fila < 0) return { ok: false, mensaje: 'Registro no encontrado.' };
+      const c = COLUMNAS.indexOf('estado') + 1;
+      // Se usa el N° guardado en la hoja (no el del navegador) para no pisar uno ya asignado
+      const guardado = sh.getRange(fila, c + 1).getValue();
+      nro = nroMatriculaPara_(sh, estado, guardado || nroMatricula);
+      sh.getRange(fila, c, 1, 2).setValues([[estado, nro]]);
+      sh.getRange(fila, COLUMNAS.indexOf('fechaModificacion') + 1, 1, 2).setValues([[ahora, ses.usuario]]);
+    } finally { lock.releaseLock(); }
+    bitacora_(ses.usuario, 'Cambiar estado', 'N° ' + num + ' → ' + estado + (nro ? ' · Matrícula ' + nro : ''));
+    return { ok: true, nroMatricula: nro, fechaModificacion: fmtFecha_(ahora, 'dd/MM/yyyy HH:mm'), modificadoPor: ses.usuario };
   } catch (e) { return errorApi_(e); }
 }
 
