@@ -300,3 +300,4 @@ select.estado-sel{min-width:132px}
   .tabla .acc{display:grid;grid-template-columns:repeat(3,auto);gap:4px;justify-content:end}
   .tabla .acc .btn-ico{width:32px;height:32px}
 }
+.nro-mat{display:inline-block;margin-top:4px;padding:1px 7px;border-radius:999px;background:#fdf8d8;border:1px solid #e8d41c;color:#142c66;font-size:11.5px;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
