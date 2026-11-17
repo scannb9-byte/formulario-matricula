@@ -565,7 +565,7 @@ function pintarTabla(){
     if(puede('editar'))acc+='<button class="btn-ico" title="Reenviar correo de confirmación" onclick="reenviar(\''+n+'\')"><span data-i="correo"></span></button>';
     if(puede('eliminar'))acc+='<button class="btn-ico rojo" title="Eliminar" onclick="eliminarRegistro(\''+n+'\')"><span data-i="basura"></span></button>';
     return '<tr'+(S.sel.has(r.numRegistro)?' class="sel"':'')+'><td class="col-sel"><input type="checkbox" aria-label="Seleccionar N° '+n+'"'+(S.sel.has(r.numRegistro)?' checked':'')+' onchange="seleccionar(\''+n+'\',this.checked)"></td>'+
-      '<td data-l="N°"><div><b>'+n+'</b>'+(r.nroMatricula?'<div class="sub">Mat. '+esc(r.nroMatricula)+'</div>':'')+'</div></td>'+
+      '<td data-l="N°"><div><b>'+n+'</b>'+(r.nroMatricula?'<div class="nro-mat" title="N° de matrícula">'+esc(r.nroMatricula)+'</div>':'')+'</div></td>'+
       '<td class="td-nom"><div class="nom">'+esc(r.nombre)+'</div><div class="sub">'+esc(r.run)+' · '+esc(r.timestamp)+'</div></td>'+
       '<td data-l="Curso" class="nw"><div>'+curso+'<div class="sub">Antes: '+esc(r.cursoGestionPasada)+'</div></div></td>'+
       '<td data-l="Especialidad">'+esc(r.especialidad)+'</td>'+
@@ -634,8 +634,10 @@ function cambiarEstadoRapido(n,sel){
   sel.className='control estado-sel b-'+nuevo;
   api('cambiarEstado',S.token,n,nuevo,r.nroMatricula).then(res=>{
     if(!res.ok){sel.value=anterior;sel.className='control estado-sel b-'+anterior;return toast(res.mensaje,'err');}
-    r.estado=nuevo;r.fechaModificacion=res.fechaModificacion||'';r.modificadoPor=res.modificadoPor||'';calcularStats();
-    toast('Registro N° '+n+' → '+nuevo,'ok');
+    const nroNuevo=res.nroMatricula&&res.nroMatricula!==r.nroMatricula;
+    r.estado=nuevo;r.nroMatricula=res.nroMatricula||'';r.fechaModificacion=res.fechaModificacion||'';r.modificadoPor=res.modificadoPor||'';calcularStats();
+    if(nroNuevo)pintarTabla();
+    toast('Registro N° '+n+' → '+nuevo+(nroNuevo?' · N° de matrícula '+res.nroMatricula:''),'ok');
   }).catch(e=>{sel.value=anterior;sel.className='control estado-sel b-'+anterior;errorRed(e);});
 }
 
@@ -656,7 +658,7 @@ function editarRegistro(n){
   const internos='<div class="seccion"><div class="seccion-tit"><h3>Datos internos del liceo</h3></div><div class="grid">'+
     '<div class="campo"><label for="e-letra">Letra del curso</label><select class="control" id="e-letra"><option value="">Sin letra</option>'+CFG.letras.map(l=>'<option'+(l===d.letra?' selected':'')+'>'+l+'</option>').join('')+'</select><span class="ayuda">Ej: 1° Medio <b>A</b>. El curso (1°, 2°…) se cambia más abajo.</span></div>'+
     '<div class="campo"><label for="e-estado">Estado</label><select class="control" id="e-estado">'+CFG.estados.map(e=>'<option'+(e===d.estado?' selected':'')+'>'+esc(e)+'</option>').join('')+'</select></div>'+
-    '<div class="campo"><label for="e-nroMatricula">N° de matrícula</label><input class="control" id="e-nroMatricula" maxlength="20" value="'+esc(d.nroMatricula)+'"><span class="ayuda">Se imprime en la ficha.</span></div></div></div>';
+    '<div class="campo"><label for="e-nroMatricula">N° de matrícula</label><input class="control" id="e-nroMatricula" maxlength="20" value="'+esc(d.nroMatricula)+'" placeholder="Se asigna al marcar Matriculado"><span class="ayuda">Se asigna solo (ej: '+CFG.anio+'-0001) al cambiar el estado a <b>Matriculado</b>. Puede corregirlo aquí.</span></div></div></div>';
   abrirModal({titulo:'Editar pre-matrícula N° '+esc(d.numRegistro),ancho:true,
     cuerpo:'<form id="form-editar" novalidate>'+internos+ESQUEMA.map(p=>p.secciones.map(s=>htmlSeccion(s,'e-')).join('')).join('')+'<div class="aviso err oculto" id="ed-err" style="margin-top:16px"></div></form>',
     pie:'<button class="btn btn-sec" onclick="cerrarModal()">Cancelar</button><button class="btn btn-pri" id="ed-ok"><span data-i="check"></span>Guardar cambios</button>'});
@@ -672,7 +674,7 @@ function editarRegistro(n){
       if(!res.ok){if(res.errores)Object.keys(res.errores).forEach(k=>FE.marcar(k,res.errores[k]));const er=$('#ed-err');er.textContent=res.mensaje;er.classList.remove('oculto');return;}
       const nuevo=desdeFila(COLUMNAS_REG,res.registro),i=S.registros.indexOf(d);
       if(i>=0)S.registros[i]=nuevo;
-      cerrarModal();toast('Registro N° '+n+' actualizado.','ok');calcularStats();filtrar(true);
+      cerrarModal();toast('Registro N° '+n+' actualizado.'+(nuevo.nroMatricula&&nuevo.nroMatricula!==d.nroMatricula?' N° de matrícula: '+nuevo.nroMatricula:''),'ok');calcularStats();filtrar(true);
     }).catch(errorRed);
   };
 }
