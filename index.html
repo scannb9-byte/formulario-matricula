@@ -1,753 +1,265 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pre-Matrícula 2026 - Liceo Bicentenario Politécnico "Cesareo Aguirre Goyenechea"</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 40px;
-            text-align: center;
-        }
-
-        .logo {
-            width: 70px;
-            height: 70px;
-            object-fit: contain;
-            margin-right: 12px;
-            vertical-align: middle;
-            filter: brightness(1.2) drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
-        }
-
-        .header h1 {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            display: inline;
-        }
-
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.95;
-        }
-
-        .form-content {
-            padding: 40px;
-        }
-
-        .section {
-            margin-bottom: 40px;
-            padding: 30px;
-            background: #f8f9fa;
-            border-radius: 15px;
-            border-left: 5px solid #667eea;
-        }
-
-        .section-title {
-            font-size: 1.5rem;
-            color: #1e3c72;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #667eea;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .section-title::before {
-            content: "📋";
-            font-size: 1.8rem;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
-
-        label {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
-            font-size: 0.95rem;
-        }
-
-        label .required {
-            color: #e74c3c;
-            margin-left: 3px;
-        }
-
-        input, select, textarea {
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            font-family: inherit;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        select {
-            cursor: pointer;
-            background-color: white;
-        }
-
-        .btn-submit {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 18px 50px;
-            border: none;
-            border-radius: 50px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: block;
-            width: 100%;
-            margin-top: 30px;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
-        }
-
-        .btn-submit:active {
-            transform: translateY(0);
-        }
-
-        .btn-submit:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .loading.active {
-            display: block;
-        }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .success-message {
-            display: none;
-            background: #d4edda;
-            border: 2px solid #c3e6cb;
-            color: #155724;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .success-message.active {
-            display: block;
-        }
-
-        .error-message {
-            display: none;
-            background: #f8d7da;
-            border: 2px solid #f5c6cb;
-            color: #721c24;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .error-message.active {
-            display: block;
-        }
-
-        .info-box {
-            background: #e7f3ff;
-            border-left: 4px solid #2196f3;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-        }
-
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 1.5rem;
-            }
-            
-            .form-content {
-                padding: 20px;
-            }
-
-            .section {
-                padding: 20px;
-            }
-
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pre-Matrícula 2027 · Liceo Bicentenario Politécnico "Cesáreo Aguirre Goyenechea"</title>
+  <meta name="description" content="Ficha de pre-matrícula en línea del Liceo Bicentenario Politécnico Cesáreo Aguirre Goyenechea, Calama.">
+  <link rel="icon" href="img/logo.png">
+  <link rel="preconnect" href="https://script.google.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1><img src="logo.png" alt="Logo" class="logo">📚 FICHA DE PRE-MATRÍCULA 2026</h1>
-            <p>Liceo Bicentenario Politécnico<br>"Cesareo Aguirre Goyenechea"</p>
-        </div>
 
-        <div class="form-content">
-            <div class="info-box">
-                <strong>📝 Instrucciones:</strong> Complete todos los campos marcados con asterisco (*). La información proporcionada será utilizada para el proceso de matrícula.
-            </div>
-
-            <form id="matriculaForm">
-                
-                <!-- SECCIÓN 1: DATOS DE MATRÍCULA -->
-                <div class="section">
-                    <h2 class="section-title">Datos de Matrícula</h2>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="fechaMatricula">Fecha de Registro <span class="required">*</span></label>
-                            <input type="date" id="fechaMatricula" name="fechaMatricula" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="curso">Curso al que Postula <span class="required">*</span></label>
-                            <select id="curso" name="curso" required>
-                                <option value="">Seleccione...</option>
-                                <option value="1°">1°</option>
-                                <option value="2°">2°</option>
-                                <option value="3°">3°</option>
-                                <option value="4°">4°</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="cursoGestionPasada">Curso de la Gestión Pasada <span class="required">*</span></label>
-                            <select id="cursoGestionPasada" name="cursoGestionPasada" required>
-                                <option value="">Seleccione...</option>
-                                <option value="8°">8°</option>
-                                <option value="1 A">1 A</option>
-                                <option value="1 B">1 B</option>
-                                <option value="1 C">1 C</option>
-                                <option value="1 D">1 D</option>
-                                <option value="1 E">1 E</option>
-                                <option value="1 F">1 F</option>
-                                <option value="1 G">1 G</option>
-                                <option value="1 H">1 H</option>
-                                <option value="2 A">2 A</option>
-                                <option value="2 B">2 B</option>
-                                <option value="2 C">2 C</option>
-                                <option value="2 D">2 D</option>
-                                <option value="2 E">2 E</option>
-                                <option value="2 F">2 F</option>
-                                <option value="2 G">2 G</option>
-                                <option value="2 H">2 H</option>
-                                <option value="3 A">3 A</option>
-                                <option value="3 B">3 B</option>
-                                <option value="3 C">3 C</option>
-                                <option value="3 D">3 D</option>
-                                <option value="3 E">3 E</option>
-                                <option value="3 F">3 F</option>
-                                <option value="3 G">3 G</option>
-                                <option value="4 A">4 A</option>
-                                <option value="4 B">4 B</option>
-                                <option value="4 C">4 C</option>
-                                <option value="4 D">4 D</option>
-                                <option value="4 E">4 E</option>
-                                <option value="4 F">4 F</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="especialidad">Especialidad</label>
-                            <select id="especialidad" name="especialidad">
-                                <option value="">Seleccione...</option>
-                                <option value="Electricidad">Electricidad</option>
-                                <option value="Mecánica Industrial">Mecánica Industrial</option>
-                                <option value="Construcciones Metalicas">Construcciones Metalicas</option>
-                                <option value="Mecanica Automotriz">Mecanica Automotriz</option>
-                                <option value="Servicios de Hoteleria">Servicios de Hoteleria</option>
-                                 <option value="No Aplica">No Aplica</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SECCIÓN 2: DATOS DEL ESTUDIANTE -->
-                <div class="section">
-                    <h2 class="section-title">Datos del Estudiante</h2>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="apellidoPaterno">Apellido Paterno <span class="required">*</span></label>
-                            <input type="text" id="apellidoPaterno" name="apellidoPaterno" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="apellidoMaterno">Apellido Materno <span class="required">*</span></label>
-                            <input type="text" id="apellidoMaterno" name="apellidoMaterno" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="nombres">Nombres <span class="required">*</span></label>
-                            <input type="text" id="nombres" name="nombres" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="run">RUN (sin puntos, con guión) <span class="required">*</span></label>
-                            <input type="text" id="run" name="run" placeholder="12345678-9" required pattern="[0-9]{7,9}-[0-9Kk]">
-                        </div>
-                        <div class="form-group">
-                            <label for="sexo">Sexo <span class="required">*</span></label>
-                            <select id="sexo" name="sexo" required>
-                                <option value="">Seleccione...</option>
-                                <option value="Masculino">Masculino</option>
-                                <option value="Femenino">Femenino</option>
-                                <option value="Otro">Otro</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="fechaNacimiento">Fecha de Nacimiento <span class="required">*</span></label>
-                            <input type="date" id="fechaNacimiento" name="fechaNacimiento" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="edad">Edad <span class="required">*</span></label>
-                            <input type="number" id="edad" name="edad" min="10" max="25" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="lugarNacimiento">Lugar de Nacimiento Comuna<span class="required">*</span></label>
-                            <input type="text" id="lugarNacimiento" name="lugarNacimiento" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="pais">País <span class="required">*</span></label>
-                            <input type="text" id="pais" name="pais" value="Chile" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="nacionalidad">Nacionalidad <span class="required">*</span></label>
-                            <input type="text" id="nacionalidad" name="nacionalidad" value="Chilena" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="religion">Religión(Catolica,Evangelica,etc) <span class="required">*</span></label>
-                            <input type="text" id="religion" name="religion" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="etnia">Etnia <span class="required">*</span></label>
-                            <select id="etnia" name="etnia" required>
-                                <option value="">Seleccione...</option>
-                                <option value="Ninguna">Ninguna</option>
-                                <option value="Mapuche">Mapuche</option>
-                                <option value="Aymara">Aymara</option>
-                                <option value="Rapa Nui">Rapa Nui</option>
-                                <option value="Quechua">Quechua</option>
-                                <option value="Otra">Otra</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="celularEstudiante">Celular del Estudiante <span class="required">*</span></label>
-                            <input type="tel" id="celularEstudiante" name="celularEstudiante" placeholder="56912345678" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="correoEstudiante">Correo Electrónico <span class="required">*</span></label>
-                            <input type="email" id="correoEstudiante" name="correoEstudiante" required>
-                        </div>
-                        <div class="form-group full-width">
-                            <label for="domicilioEstudiante">Domicilio del Estudiante <span class="required">*</span></label>
-                            <input type="text" id="domicilioEstudiante" name="domicilioEstudiante" required>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SECCIÓN 3: DATOS APODERADO TITULAR -->
-                <div class="section">
-                    <h2 class="section-title">Datos del Apoderado Titular</h2>
-                    <div class="form-grid">
-                        <div class="form-group full-width">
-                            <label for="nombreApoderadoTitular">Nombre Completo <span class="required">*</span></label>
-                            <input type="text" id="nombreApoderadoTitular" name="nombreApoderadoTitular" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="correoApoderadoTitular">Correo Electrónico <span class="required">*</span></label>
-                            <input type="email" id="correoApoderadoTitular" name="correoApoderadoTitular" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="fonoApoderadoTitular">Teléfono <span class="required">*</span></label>
-                            <input type="tel" id="fonoApoderadoTitular" name="fonoApoderadoTitular" placeholder="56912345678" required>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SECCIÓN 4: DATOS APODERADO SUPLENTE -->
-                <div class="section">
-                    <h2 class="section-title">Datos del Apoderado Suplente</h2>
-                    <div class="form-grid">
-                        <div class="form-group full-width">
-                            <label for="nombreApoderadoSuplente">Nombre Completo <span class="required">*</span></label>
-                            <input type="text" id="nombreApoderadoSuplente" name="nombreApoderadoSuplente" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="correoApoderadoSuplente">Correo Electrónico <span class="required">*</span></label>
-                            <input type="email" id="correoApoderadoSuplente" name="correoApoderadoSuplente" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="fonoApoderadoSuplente">Teléfono <span class="required">*</span></label>
-                            <input type="tel" id="fonoApoderadoSuplente" name="fonoApoderadoSuplente" placeholder="56912345678" required>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SECCIÓN 5: INFORMACIÓN FAMILIAR -->
-                <div class="section">
-                    <h2 class="section-title">Información Familiar</h2>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="profesionPadre">Profesión u Oficio del Padre <span class="required">*</span></label>
-                            <input type="text" id="profesionPadre" name="profesionPadre" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="profesionMadre">Profesión u Oficio de la Madre <span class="required">*</span></label>
-                            <input type="text" id="profesionMadre" name="profesionMadre" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="profesionApoderado">Profesión u Oficio del Apoderado</label>
-                            <input type="text" id="profesionApoderado" name="profesionApoderado">
-                        </div>
-                        <div class="form-group">
-                            <label for="personaConQuienVive">Persona con quien vive <span class="required">*</span></label>
-                            <select id="personaConQuienVive" name="personaConQuienVive" required>
-                                <option value="">Seleccione...</option>
-                                <option value="Ambos padres">Ambos padres</option>
-                                <option value="Madre">Madre</option>
-                                <option value="Padre">Padre</option>
-                                <option value="Abuelos">Abuelos</option>
-                                <option value="Otro familiar">Otro familiar</option>
-                                <option value="Otro">Otro</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="totalHijos">Total de Hijos en la Familia <span class="required">*</span></label>
-                            <input type="number" id="totalHijos" name="totalHijos" min="1" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="lugarQueOcupa">Lugar que ocupa entre ellos</label>
-                            <input type="number" id="lugarQueOcupa" name="lugarQueOcupa" min="1">
-                        </div>
-                        <div class="form-group">
-                            <label for="personasEnCasa">Número de personas que habitan en casa</label>
-                            <input type="number" id="personasEnCasa" name="personasEnCasa" min="1">
-                        </div>
-                        <div class="form-group">
-                            <label for="tipoDomicilio">Domicilio</label>
-                            <select id="tipoDomicilio" name="tipoDomicilio">
-                                <option value="">Seleccione...</option>
-                                <option value="Propio">Propio</option>
-                                <option value="Arrendado">Arrendado</option>
-                                <option value="Cedido">Cedido</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="situacionEconomica">Situación Económica</label>
-                            <select id="situacionEconomica" name="situacionEconomica">
-                                <option value="">Seleccione...</option>
-                                <option value="Alta(+ $900.000)">Alta(+ $900.000)</option>
-                                <option value="Media-Alta($701.000 - $900.000)">Media-Alta($701.000 - $900.000)</option>
-                                <option value="Media($501.000 - $700.000)">Media($501.000 - $700.000)</option>
-                                <option value="Media-Baja($301.000 - $500.000)">Media-Baja($301.000 - $500.000)</option>
-                                <option value="Baja(- $300.000)">Baja(- $300.000)</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SECCIÓN 6: BENEFICIOS Y SALUD -->
-                <div class="section">
-                    <h2 class="section-title">Beneficios y Salud</h2>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="subsidioUnicoFamiliar">¿Recibe Subsidio Único Familiar? <span class="required">*</span></label>
-                            <select id="subsidioUnicoFamiliar" name="subsidioUnicoFamiliar" required>
-                                <option value="">Seleccione...</option>
-                                <option value="Sí">Sí</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="beneficioJunaeb">Beneficio JUNAEB <span class="required">*</span></label>
-                            <select id="beneficioJunaeb" name="beneficioJunaeb" required>
-                                <option value="">Seleccione...</option>
-                                <option value="Sí">Sí</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="chileSolidario">Chile Solidario <span class="required">*</span></label>
-                            <select id="chileSolidario" name="chileSolidario" required>
-                                <option value="">Seleccione...</option>
-                                <option value="Sí">Sí</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="becaIndigena">Beca Indígena <span class="required">*</span></label>
-                            <select id="becaIndigena" name="becaIndigena" required>
-                                <option value="">Seleccione...</option>
-                                <option value="Sí">Sí</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
-                        <div class="form-group full-width">
-                            <label for="cuidadosEspeciales">Cuidados Especiales (Enfermedades)</label>
-                            <textarea id="cuidadosEspeciales" name="cuidadosEspeciales" placeholder="Indique si el estudiante tiene alguna enfermedad o condición especial..."></textarea>
-                        </div>
-                        <div class="form-group full-width">
-                            <label for="medicamentosContraindicados">Medicamentos Contraindicados</label>
-                            <textarea id="medicamentosContraindicados" name="medicamentosContraindicados" placeholder="Indique medicamentos a los que el estudiante sea alérgico..."></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="atencionSalud">Sistema de Atención de Salud</label>
-                            <select id="atencionSalud" name="atencionSalud">
-                                <option value="">Seleccione...</option>
-                                <option value="FONASA">FONASA</option>
-                                <option value="ISAPRE">ISAPRE</option>
-                                <option value="Otro">Otro</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SECCIÓN 7: CONTACTO DE EMERGENCIA -->
-                <div class="section">
-                    <h2 class="section-title">Contacto de Emergencia</h2>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="contactoEmergencia">En caso de emergencia llamar a <span class="required">*</span></label>
-                            <input type="text" id="contactoEmergencia" name="contactoEmergencia" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="telefonoEmergencia">Teléfono de Emergencia <span class="required">*</span></label>
-                            <input type="tel" id="telefonoEmergencia" name="telefonoEmergencia" placeholder="56912345678" required>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SECCIÓN 8: INFORMACIÓN ACADÉMICA -->
-                <div class="section">
-                    <h2 class="section-title">Información Académica</h2>
-                    <div class="form-grid">
-                        <div class="form-group full-width">
-                            <label for="procedenciaEscuela">Procedencia de Escuela/Colegio</label>
-                            <input type="text" id="procedenciaEscuela" name="procedenciaEscuela">
-                        </div>
-                        <div class="form-group full-width">
-                            <label for="cursoRepetido">Curso que ha repetido (si aplica)</label>
-                            <input type="text" id="cursoRepetido" name="cursoRepetido" placeholder="Ej: 2° Medio">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- BOTÓN DE ENVÍO -->
-                <button type="submit" class="btn-submit" id="submitBtn">
-                    ✅ Enviar Solicitud de Pre-Matrícula
-                </button>
-
-                <!-- LOADING -->
-                <div class="loading" id="loading">
-                    <div class="spinner"></div>
-                    <p>Enviando información...</p>
-                </div>
-
-                <!-- MENSAJES -->
-                <div class="success-message" id="successMessage">
-                    <h3>✅ ¡Formulario enviado exitosamente!</h3>
-                    <p>Hemos recibido su solicitud de pre-matrícula. Nos pondremos en contacto pronto.</p>
-                </div>
-
-                <div class="error-message" id="errorMessage">
-                    <h3>❌ Error al enviar el formulario</h3>
-                    <p id="errorText">Por favor, intente nuevamente.</p>
-                </div>
-            </form>
-        </div>
+<!-- ================= BARRA SUPERIOR ================= -->
+<header class="topbar">
+  <div class="in">
+    <div class="marca" onclick="irInicio()">
+      <img class="logo-img" src="img/logo.png" alt="Logo Liceo">
+      <div style="min-width:0">
+        <div class="t1">Liceo Bicentenario Politécnico</div>
+        <div class="t2">Cesáreo Aguirre Goyenechea</div>
+      </div>
     </div>
+    <div class="acciones" id="acciones-publicas">
+      <button class="btn btn-ghost" onclick="irFormulario()"><span data-i="doc"></span><span class="txt">Pre-matrícula</span></button>
+      <button class="btn btn-pri" onclick="irLogin()"><span data-i="lock"></span><span class="txt">Acceso personal</span></button>
+    </div>
+    <div class="acciones oculto" id="acciones-privadas">
+      <div class="usuario-chip" id="chip" onclick="toggleMenu(event)">
+        <div><div class="n" id="chip-nombre"></div><div class="r" id="chip-rol"></div></div>
+        <div class="av" id="chip-av"></div>
+        <div class="menu oculto" id="menu-usuario">
+          <button onclick="mostrarVista('v-panel')"><span data-i="grid"></span>Panel</button>
+          <button onclick="irFormulario()"><span data-i="doc"></span>Nueva pre-matrícula</button>
+          <button onclick="modalPassword(false)"><span data-i="key"></span>Cambiar contraseña</button>
+          <button onclick="logout()"><span data-i="salir"></span>Cerrar sesión</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
 
-    <script>
-        // CONFIGURACIÓN - REEMPLAZA CON TU URL DE GOOGLE APPS SCRIPT
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzAMswelJrcVMNXZDvzrstGK_5AGC2TzdzQvBMkjH8Lp6vIYtxgV2pvRik4owRZdZQb/exec';
+<main>
+  <!-- ================= INICIO ================= -->
+  <section id="v-inicio" class="vista">
+    <div class="hero">
+      <div class="in">
+        <div>
+          <span class="eyebrow"><span data-i="cal"></span> Proceso de admisión <span class="anio"></span></span>
+          <h1>Ficha de <span>Pre-Matrícula <span class="anio"></span></span><br>Educación Técnico Profesional</h1>
+          <p>Complete la ficha en línea en pocos minutos. Al finalizar recibirá un correo de confirmación con su número de pre-matrícula.</p>
+          <div class="ctas">
+            <button class="btn btn-oro btn-lg" onclick="irFormulario()"><span data-i="doc"></span>Completar pre-matrícula</button>
+            <button class="btn btn-sec btn-lg" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.35)" onclick="irLogin()"><span data-i="lock"></span>Acceso personal del liceo</button>
+          </div>
+        </div>
+        <div class="sello"><img class="logo-img" src="img/logo.png" alt="Logo"></div>
+      </div>
+    </div>
+    <div class="inicio-cards">
+      <div class="card icard">
+        <div class="ic"><span data-i="lista"></span></div>
+        <h3>¿Cómo funciona?</h3>
+        <ul class="pasos-lista">
+          <li>Complete los 7 pasos de la ficha con los datos del estudiante y apoderados.</li>
+          <li>Reciba en el correo del apoderado titular la confirmación con su N° de pre-matrícula.</li>
+          <li>Asista a la matrícula presencial: el liceo tendrá su ficha impresa para firmarla.</li>
+        </ul>
+      </div>
+      <div class="card icard">
+        <div class="ic"><span data-i="clip"></span></div>
+        <h3>Documentos para la matrícula</h3>
+        <ul>
+          <li>Certificado de nacimiento original</li>
+          <li>Certificados de estudios (8° Básico a 4° Medio, según corresponda)</li>
+          <li>Fotografía 3 x 3,5 cm</li>
+          <li>Fotocopia cédula de identidad (estudiante y apoderado)</li>
+          <li>Registro Social de Hogares</li>
+        </ul>
+      </div>
+      <div class="card icard">
+        <div class="ic"><span data-i="escudo"></span></div>
+        <h3>Especialidades (3° y 4° Medio)</h3>
+        <ul>
+          <li>Electricidad</li><li>Mecánica Industrial</li><li>Construcciones Metálicas</li><li>Mecánica Automotriz</li><li>Servicios de Hotelería</li>
+        </ul>
+      </div>
+    </div>
+    <div class="pie">© <span class="anio"></span> Liceo Bicentenario Politécnico "Cesáreo Aguirre Goyenechea" · Calama</div>
+  </section>
 
-        // Calcular edad automáticamente
-        document.getElementById('fechaNacimiento').addEventListener('change', function() {
-            const fechaNac = new Date(this.value);
-            const hoy = new Date();
-            let edad = hoy.getFullYear() - fechaNac.getFullYear();
-            const mes = hoy.getMonth() - fechaNac.getMonth();
-            
-            if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
-                edad--;
-            }
-            
-            document.getElementById('edad').value = edad;
-        });
+  <!-- ================= LOGIN ================= -->
+  <section id="v-login" class="vista oculto">
+    <div class="login-wrap">
+      <form class="card login" id="form-login" autocomplete="on" novalidate>
+        <div class="cab">
+          <img class="logo-img" src="img/logo.png" alt="Logo">
+          <h2>Acceso del personal</h2>
+          <p>Ingrese con su usuario y contraseña asignados.</p>
+        </div>
+        <div class="campo" style="margin-bottom:14px">
+          <label for="lg-usuario">Usuario</label>
+          <input class="control" id="lg-usuario" autocomplete="username" autocapitalize="none" required>
+        </div>
+        <div class="campo" style="margin-bottom:18px">
+          <label for="lg-pass">Contraseña</label>
+          <div style="position:relative">
+            <input class="control" id="lg-pass" type="password" autocomplete="current-password" required style="padding-right:46px">
+            <button type="button" class="btn-ico" style="position:absolute;right:6px;top:6px;border:0" onclick="verPass('lg-pass')" aria-label="Mostrar contraseña"><span data-i="ojo"></span></button>
+          </div>
+        </div>
+        <div id="lg-error" class="aviso err oculto" style="margin-bottom:14px"></div>
+        <button class="btn btn-pri btn-lg" style="width:100%" type="submit"><span data-i="lock"></span>Ingresar</button>
+        <p style="text-align:center;margin-top:16px;font-size:13px;color:var(--muted)">¿Olvidó su contraseña? Solicite al administrador que la restablezca.</p>
+      </form>
+    </div>
+  </section>
 
-        // Fecha actual por defecto
-        document.getElementById('fechaMatricula').valueAsDate = new Date();
+  <!-- ================= FORMULARIO ================= -->
+  <section id="v-form" class="vista oculto">
+    <div class="contenedor">
+      <div class="form-wrap">
+        <div class="form-cab">
+          <div>
+            <h2>Ficha de Pre-Matrícula <span class="anio"></span></h2>
+            <p>Los campos marcados con <b style="color:var(--rojo)">*</b> son obligatorios.</p>
+          </div>
+          <span class="guardado" id="guardado"></span>
+        </div>
+        <div id="form-cerrado" class="aviso warn oculto"><span data-i="info"></span><div>El proceso de pre-matrícula se encuentra cerrado. Para más información comuníquese con el liceo.</div></div>
+        <div id="form-abierto">
+          <div class="stepper" id="stepper"></div>
+          <div class="paso-movil" id="paso-movil"></div>
+          <div class="barra-progreso"><div id="progreso"></div></div>
+          <form class="card panel-form" id="form-matricula" novalidate autocomplete="off">
+            <input type="text" name="website" id="website" class="sr" tabindex="-1" autocomplete="off" aria-hidden="true">
+            <div id="pasos"></div>
+            <div class="nav-form">
+              <button type="button" class="btn btn-sec" id="btn-ant" onclick="pasoAnterior()"><span data-i="izq"></span>Anterior</button>
+              <div class="der">
+                <button type="button" class="btn btn-pri" id="btn-sig" onclick="pasoSiguiente()">Siguiente<span data-i="der"></span></button>
+                <button type="submit" class="btn btn-oro oculto" id="btn-enviar"><span data-i="enviar"></span>Enviar pre-matrícula</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        // Manejar envío del formulario
-        document.getElementById('matriculaForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const submitBtn = document.getElementById('submitBtn');
-            const loading = document.getElementById('loading');
-            const successMsg = document.getElementById('successMessage');
-            const errorMsg = document.getElementById('errorMessage');
-            
-            // Resetear mensajes
-            successMsg.classList.remove('active');
-            errorMsg.classList.remove('active');
-            
-            // Mostrar loading
-            submitBtn.disabled = true;
-            loading.classList.add('active');
-            
-            // Recopilar datos del formulario
-const formData = new FormData(this);
+  <!-- ================= ÉXITO ================= -->
+  <section id="v-exito" class="vista oculto">
+    <div class="contenedor">
+      <div class="card exito">
+        <div class="ok-ic"><span data-i="check"></span></div>
+        <h2>¡Pre-matrícula enviada!</h2>
+        <p id="ex-nombre" style="color:var(--muted)"></p>
+        <div class="folio"><span style="font-size:13px;color:var(--muted)">N° de pre-matrícula</span><b id="ex-num"></b></div>
+        <div id="ex-email" class="aviso" style="text-align:left"></div>
+        <div class="botones">
+          <button class="btn btn-sec" onclick="nuevoFormulario()"><span data-i="mas"></span>Nueva pre-matrícula</button>
+        </div>
+        <p style="margin-top:18px;font-size:13px;color:var(--muted)">Guarde su N° de pre-matrícula. El día de la matrícula presencial deberá firmar la ficha y presentar los documentos solicitados.</p>
+      </div>
+    </div>
+  </section>
 
-// Convertir a URLSearchParams
-const params = new URLSearchParams();
-for (let [key, value] of formData.entries()) {
-    params.append(key, value);
-}
+  <!-- ================= PANEL ================= -->
+  <section id="v-panel" class="vista oculto">
+    <div class="contenedor">
+      <div class="panel-cab">
+        <div>
+          <h2>Panel de Pre-Matrículas</h2>
+          <p id="panel-sub">Gestión de fichas <span class="anio"></span></p>
+        </div>
+        <div class="tabs" id="tabs">
+          <button class="tab activo" data-tab="t-registros" onclick="cambiarTab(this)"><span data-i="lista"></span>Registros</button>
+          <button class="tab oculto" id="tab-usuarios" data-tab="t-usuarios" onclick="cambiarTab(this)"><span data-i="usuarios"></span>Usuarios</button>
+        </div>
+      </div>
 
-try {
-    // Enviar datos
-    const response = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        body: params
-    });
-                
-                console.log('Respuesta recibida, status:', response.status);
-                
-                // Si llegamos aquí, fue exitoso
-                successMsg.classList.add('active');
-                this.reset();
-                document.getElementById('fechaMatricula').valueAsDate = new Date();
-                successMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                
-            } catch (error) {
-                console.error('Error con fetch normal, intentando método alternativo:', error);
-                
-                // MÉTODO 2: Si falla, usar método de redirección (más compatible)
-                try {
-                    // Crear un formulario temporal oculto
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = SCRIPT_URL;
-                    form.target = 'hidden_iframe';
-                    form.style.display = 'none';
-                    
-                    // Agregar todos los campos
-                    for (let [key, value] of formData.entries()) {
-                        const input = document.createElement('input');
-                        input.type = 'hidden';
-                        input.name = key;
-                        input.value = value;
-                        form.appendChild(input);
-                    }
-                    
-                    // Crear iframe oculto
-                    let iframe = document.getElementById('hidden_iframe');
-                    if (!iframe) {
-                        iframe = document.createElement('iframe');
-                        iframe.name = 'hidden_iframe';
-                        iframe.id = 'hidden_iframe';
-                        iframe.style.display = 'none';
-                        document.body.appendChild(iframe);
-                    }
-                    
-                    // Enviar el formulario
-                    document.body.appendChild(form);
-                    form.submit();
-                    
-                    // Esperar un momento y mostrar éxito
-                    setTimeout(() => {
-                        successMsg.classList.add('active');
-                        this.reset();
-                        document.getElementById('fechaMatricula').valueAsDate = new Date();
-                        successMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        document.body.removeChild(form);
-                    }, 1000);
-                    
-                } catch (altError) {
-                    console.error('Error con método alternativo:', altError);
-                    throw new Error('No se pudo conectar con el servidor. Verifique la URL de Apps Script.');
-                }
-            } finally {
-                loading.classList.remove('active');
-                submitBtn.disabled = false;
-            }
-        });
-    </script>
+      <!-- Registros -->
+      <div id="t-registros" class="tab-pane">
+        <div class="stats" id="stats"></div>
+        <div class="dist dist3">
+          <div class="card"><h4>Por curso <span class="anio"></span></h4><div id="dist-curso"></div></div>
+          <div class="card"><h4>Por curso y letra</h4><div id="dist-letra"></div></div>
+          <div class="card"><h4>Por especialidad (3° y 4°)</h4><div id="dist-esp"></div></div>
+        </div>
+        <div class="card">
+          <div class="toolbar">
+            <div class="buscar"><span data-i="lupa"></span><input class="control" id="flt-buscar" placeholder="Buscar por nombre, RUN, apoderado o N°…" oninput="filtrar()"></div>
+            <select class="control" id="flt-curso" onchange="filtrar()"><option value="">Todos los cursos</option></select>
+            <select class="control" id="flt-letra" onchange="filtrar()"><option value="">Todas las letras</option></select>
+            <select class="control" id="flt-esp" onchange="filtrar()"><option value="">Todas las especialidades</option></select>
+            <select class="control" id="flt-estado" onchange="filtrar()"><option value="">Todos los estados</option></select>
+            <button class="btn btn-sec btn-sm" onclick="cargarPanel()" title="Actualizar"><span data-i="refrescar"></span>Actualizar</button>
+            <button class="btn btn-sec btn-sm" onclick="exportar()" title="Exportar a Excel (CSV) los registros filtrados"><span data-i="descargar"></span>Exportar</button>
+            <button class="btn btn-sec btn-sm" onclick="imprimirNomina()" title="Imprimir la lista de los registros filtrados (nómina)"><span data-i="lista"></span>Imprimir listado</button>
+            <button class="btn btn-sec btn-sm" onclick="imprimirFicha('')" title="Imprimir ficha en blanco"><span data-i="impresora"></span>Ficha en blanco</button>
+            <a class="btn btn-sec btn-sm oculto" id="btn-planilla" target="_blank" rel="noopener"><span data-i="tabla"></span>Planilla</a>
+          </div>
+          <div class="seleccion oculto" id="barra-sel">
+            <b id="sel-info"></b>
+            <span class="sel-grupo" id="sel-letra-grupo">
+              <select class="control" id="sel-letra"></select>
+              <button class="btn btn-pri btn-sm" onclick="asignarLetraSeleccion()"><span data-i="check"></span>Asignar letra</button>
+            </span>
+            <button class="btn btn-sec btn-sm" onclick="imprimirSeleccion()"><span data-i="impresora"></span>Imprimir fichas</button>
+            <button class="btn btn-sec btn-sm" onclick="pdfSeleccion()"><span data-i="pdf"></span>PDF</button>
+            <button class="btn btn-ghost btn-sm" onclick="limpiarSeleccion()"><span data-i="x"></span>Quitar selección</button>
+          </div>
+          <div class="tabla-wrap">
+            <table class="tabla">
+              <thead><tr>
+                <th class="sin col-sel"><input type="checkbox" id="sel-todos" title="Seleccionar todos los registros filtrados" onchange="seleccionarTodos(this.checked)"></th>
+                <th data-o="numRegistro">N°</th>
+                <th data-o="nombre">Estudiante</th>
+                <th data-o="cursoLetra">Curso</th>
+                <th data-o="especialidad">Especialidad</th>
+                <th data-o="apoderado">Apoderado titular</th>
+                <th data-o="estado">Estado</th>
+                <th data-o="emailEnviado">Correo</th>
+                <th class="sin" style="text-align:right">Acciones</th>
+              </tr></thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+          <div class="paginacion"><span id="pg-info"></span><div class="pg" id="pg-btns"></div></div>
+        </div>
+      </div>
+
+      <!-- Usuarios -->
+      <div id="t-usuarios" class="tab-pane oculto">
+        <div class="roles" id="roles-info"></div>
+        <div class="card">
+          <div class="toolbar">
+            <strong style="flex:1">Usuarios del sistema</strong>
+            <button class="btn btn-pri btn-sm" onclick="modalUsuario(null)"><span data-i="mas"></span>Nuevo usuario</button>
+          </div>
+          <div class="tabla-wrap">
+            <table class="tabla">
+              <thead><tr><th class="sin">Usuario</th><th class="sin">Rol</th><th class="sin">Correo</th><th class="sin">Estado</th><th class="sin">Último acceso</th><th class="sin" style="text-align:right">Acciones</th></tr></thead>
+              <tbody id="tbody-usuarios"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="modal-raiz"></div>
+<div id="toasts"></div>
+<div id="cargando" class="oculto"><div><div class="spinner" style="margin:0 auto"></div><div class="cargando-txt" id="cargando-txt">Cargando…</div></div></div>
+
+<script src="js/config.js"></script>
+<script src="js/esquema.js"></script>
+<script src="js/ficha.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
