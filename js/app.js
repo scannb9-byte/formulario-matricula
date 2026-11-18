@@ -12,6 +12,7 @@ const IC = {
   key:'<circle cx="7.5" cy="15.5" r="4.5"/><path d="m10.7 12.3 9.3-9.3M16 7l3 3M14 9l2 2"/>',
   salir:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>',
   cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  grafico:'<path d="M3 3v18h18"/><path d="M7 15h4M7 11h9M7 7h6"/>',
   lista:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
   clip:'<path d="m21.4 11.1-9.2 9.2a6 6 0 0 1-8.5-8.5l9.2-9.2a4 4 0 0 1 5.7 5.7l-9.2 9.2a2 2 0 0 1-2.8-2.8l8.5-8.5"/>',
   escudo:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
@@ -510,6 +511,7 @@ function cambiarTab(btn){
   $$('#tabs .tab').forEach(t=>t.classList.toggle('activo',t===btn));
   $$('.tab-pane').forEach(p=>p.classList.toggle('oculto',p.id!==btn.dataset.tab));
   if(btn.dataset.tab==='t-usuarios')cargarUsuarios();
+  if(btn.dataset.tab==='t-estad')renderEstadisticas();
 }
 function puede(p){return S.sesion&&S.sesion.permisos&&S.sesion.permisos[p];}
 
@@ -547,6 +549,7 @@ function calcularStats(){
     if(r.emailEnviado!=='Sí')s.emailPendiente++;
   });
   S.stats=s;pintarStats();
+  if(typeof renderEstadisticas==='function')renderEstadisticas();
 }
 function pintarStats(){
   const s=S.stats,e=s.porEstado||{};
