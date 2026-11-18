@@ -178,6 +178,7 @@
         </div>
         <div class="tabs" id="tabs">
           <button class="tab activo" data-tab="t-registros" onclick="cambiarTab(this)"><span data-i="lista"></span>Registros</button>
+          <button class="tab" data-tab="t-estad" onclick="cambiarTab(this)"><span data-i="grafico"></span>Estadísticas</button>
           <button class="tab oculto" id="tab-usuarios" data-tab="t-usuarios" onclick="cambiarTab(this)"><span data-i="usuarios"></span>Usuarios</button>
         </div>
       </div>
@@ -233,6 +234,44 @@
         </div>
       </div>
 
+      <!-- Estadísticas y reportes -->
+      <div id="t-estad" class="tab-pane oculto">
+        <div class="card est-filtros">
+          <span data-i="filtro"></span><b>Considerar:</b>
+          <select class="control" id="est-curso"></select>
+          <select class="control" id="est-letra"></select>
+          <select class="control" id="est-estado"></select>
+          <span class="est-total" id="est-total"></span>
+          <button class="btn btn-sec btn-sm" onclick="irAReporte(E.dim,E.val)"><span data-i="impresora"></span>Reportes</button>
+        </div>
+        <div class="est-kpis" id="est-kpis"></div>
+        <div class="est-grid" id="est-graficos"></div>
+
+        <div class="card reportes" id="reportes">
+          <div class="rep-cab">
+            <div><h3>Reportes para imprimir</h3><p>Use los filtros de arriba (curso, letra, estado) para acotar el reporte. Al hacer clic en una barra del tablero se prepara su nómina.</p></div>
+          </div>
+          <div class="rep-tipos">
+            <label class="rep-tipo"><input type="radio" name="rep-tipo" value="nomina" checked><span><b>Nómina por grupo</b><small>Lista de estudiantes de cada grupo (ej: todos los Aymara, todos los de Electricidad).</small></span></label>
+            <label class="rep-tipo"><input type="radio" name="rep-tipo" value="resumen"><span><b>Resumen de una variable</b><small>Cantidad y porcentaje por grupo, con gráfico.</small></span></label>
+            <label class="rep-tipo"><input type="radio" name="rep-tipo" value="general"><span><b>Informe general</b><small>Todas las variables en un solo documento.</small></span></label>
+          </div>
+          <div class="grid rep-grid">
+            <div class="campo" id="rep-dim-campo"><label for="rep-dim">Agrupar por</label><select class="control" id="rep-dim"></select></div>
+            <div class="campo" id="rep-grupo-campo"><label for="rep-val">Grupo</label><select class="control" id="rep-val"></select></div>
+          </div>
+          <div class="rep-opc" id="rep-opc-nomina">
+            <label class="check"><input type="checkbox" id="rep-salto" checked> Cada grupo en una página nueva</label>
+            <label class="check"><input type="checkbox" id="rep-firma"> Agregar columna para firma</label>
+          </div>
+          <div class="rep-pie">
+            <span id="rep-info"></span>
+            <button class="btn btn-sec" onclick="exportarReporte()"><span data-i="descargar"></span>Exportar Excel</button>
+            <button class="btn btn-pri" onclick="imprimirReporte()"><span data-i="impresora"></span>Imprimir reporte</button>
+          </div>
+        </div>
+      </div>
+
       <!-- Usuarios -->
       <div id="t-usuarios" class="tab-pane oculto">
         <div class="roles" id="roles-info"></div>
@@ -261,5 +300,6 @@
 <script src="js/esquema.js"></script>
 <script src="js/ficha.js"></script>
 <script src="js/app.js"></script>
+<script src="js/estadisticas.js"></script>
 </body>
 </html>
