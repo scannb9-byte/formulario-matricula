@@ -40,7 +40,7 @@ function enviarComprobante_(r) {
     + 'La ficha de matrícula será impresa por el liceo y deberá firmarla el día de la matrícula presencial.</p>'
     + '<table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #eef0f5;border-radius:8px;">'
     + fila('N° de pre-matrícula', r.numRegistro) + fila('Estudiante', nombreEst) + fila('RUN', r.run)
-    + fila('Curso ' + CONFIG.ANIO, curso) + (r.especialidad && r.especialidad !== 'No Aplica' ? fila('Especialidad', r.especialidad) : '')
+    + fila('Curso ' + CONFIG.ANIO, curso) + (r.especialidad && claveOpcion_(r.especialidad) !== 'NO APLICA' ? fila('Especialidad', r.especialidad) : '')
     + fila('Fecha de registro', fecha)
     + '</table>'
     + '<h3 style="font-size:15px;color:#13306b;margin:24px 0 8px;">Próximos pasos</h3>'
@@ -62,7 +62,7 @@ function enviarComprobante_(r) {
     + 'Estimado/a ' + (r.nombreApoderadoTitular || 'Apoderado/a') + ',\n\n'
     + 'Hemos recibido la solicitud de pre-matrícula:\n'
     + '- N° de pre-matrícula: ' + r.numRegistro + '\n- Estudiante: ' + nombreEst + '\n- RUN: ' + r.run + '\n- Curso: ' + curso + '\n'
-    + (r.especialidad && r.especialidad !== 'No Aplica' ? '- Especialidad: ' + r.especialidad + '\n' : '')
+    + (r.especialidad && claveOpcion_(r.especialidad) !== 'NO APLICA' ? '- Especialidad: ' + r.especialidad + '\n' : '')
     + '\nLa ficha de matrícula será impresa por el liceo y deberá firmarla en la matrícula presencial.\n';
 
   const opciones = { name: CONFIG.EMAIL_REMITENTE, htmlBody: html };

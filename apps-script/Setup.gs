@@ -26,6 +26,10 @@ function configurarSistema() {
     sh.getRange(2, cMail, n - 1, 1).setValues(mail.map((r, i) => [r[0] || (fijos[i][0] !== '' ? 'Sí' : '')]));
   }
 
+  // 2b) Versión 3: datos existentes a MAYÚSCULAS y opciones nuevas
+  const convertidos = migrarDatosV3_(sh);
+  if (convertidos) Logger.log('🔠 Registros convertidos a mayúsculas / opciones nuevas: ' + convertidos);
+
   // 3) Listas desplegables (estado y letra) y formato de fechas en columnas completas
   const filasMax = Math.max(sh.getMaxRows() - 1, 1);
   const regla = SpreadsheetApp.newDataValidation().requireValueInList(ESTADOS, true).setAllowInvalid(false).build();
@@ -62,6 +66,45 @@ function instalarDisparadorDiario() {
   ScriptApp.getProjectTriggers().filter(t => t.getHandlerFunction() === 'reenviarPendientes').forEach(t => ScriptApp.deleteTrigger(t));
   ScriptApp.newTrigger('reenviarPendientes').timeBased().everyDays(1).atHour(8).create();
   Logger.log('✅ Disparador diario instalado.');
+}
+
+/**
+ * Deja los registros existentes con el formato de la versión 3 (se puede ejecutar varias veces):
+ *  - Textos y opciones en MAYÚSCULAS (salvo correos, fechas y columnas internas).
+ *  - Domicilio "Cedido" / "Allegado" → "OTROS".
+ *  - Profesión de padre/madre vacía → "NO APLICA".
+ *  - "alumnoAntiguo" según la escuela de procedencia.
+ */
+function migrarDatosV3_(sh) {
+  const n = sh.getLastRow();
+  if (n < 2) return 0;
+  const sinTocar = ['timestamp', 'numRegistro', 'fechaMatricula', 'fechaNacimiento', 'edad', 'totalHijos', 'lugarQueOcupa',
+    'personasEnCasa', 'correoEstudiante', 'correoApoderadoTitular', 'correoApoderadoSuplente', 'estado', 'nroMatricula',
+    'emailEnviado', 'fechaModificacion', 'modificadoPor'];
+  const rango = sh.getRange(2, 1, n - 1, COLUMNAS.length);
+  const filas = rango.getValues();
+  const col = k => COLUMNAS.indexOf(k);
+  const liceo = claveOpcion_(CONFIG.NOMBRE_LICEO_PROCEDENCIA);
+  let cambiados = 0;
+  filas.forEach(f => {
+    if (f[1] === '' || f[1] === null) return;
+    const antes = JSON.stringify(f);
+    COLUMNAS.forEach((k, i) => {
+      if (sinTocar.indexOf(k) >= 0 || typeof f[i] !== 'string') return;
+      f[i] = f[i].toUpperCase();
+    });
+    const dom = claveOpcion_(f[col('tipoDomicilio')]);
+    if (dom === 'CEDIDO' || dom === 'ALLEGADO') f[col('tipoDomicilio')] = 'OTROS';
+    if (!f[col('profesionPadre')]) f[col('profesionPadre')] = 'NO APLICA';
+    if (!f[col('profesionMadre')]) f[col('profesionMadre')] = 'NO APLICA';
+    if (!f[col('alumnoAntiguo')]) {
+      const proc = claveOpcion_(f[col('procedenciaEscuela')]);
+      f[col('alumnoAntiguo')] = (proc === liceo || proc.indexOf('CESAREO AGUIRRE') >= 0) ? 'SÍ' : 'NO';
+    }
+    if (JSON.stringify(f) !== antes) cambiados++;
+  });
+  if (cambiados) rango.setValues(filas);
+  return cambiados;
 }
 
 /** Crea el administrador inicial con una contraseña al azar si la hoja Usuarios está vacía. */

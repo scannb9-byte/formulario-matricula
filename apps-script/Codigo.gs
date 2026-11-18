@@ -175,8 +175,9 @@ function bitacora_(usuario, accion, detalle) {
 // ============================================================
 /** Valida RUT chileno (módulo 11). Devuelve el RUT normalizado "12345678-K" o null. */
 function normalizarRut_(rut) {
+  // Acepta RUN (7-8 dígitos) e IPE / RUT provisorio escolar (9 dígitos, ej: 100844317-K)
   let s = String(rut || '').toUpperCase().replace(/[^0-9K]/g, '');
-  if (s.length < 8 || s.length > 9) return null;
+  if (s.length < 8 || s.length > 10) return null;
   const cuerpo = s.slice(0, -1), dv = s.slice(-1);
   if (!/^\d+$/.test(cuerpo)) return null;
   let suma = 0, mul = 2;
@@ -221,6 +222,11 @@ function capitalizar_(s) {
  * Valida y limpia los datos según el esquema.
  * Devuelve { ok, errores: {campo: mensaje}, datos }
  */
+/** Mayúsculas y sin tildes, para comparar opciones sin importar cómo vengan escritas. */
+function claveOpcion_(v) {
+  return String(v || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().replace(/\s+/g, ' ').trim();
+}
+
 function validarDatos_(entrada) {
   const errores = {};
   const d = {};
@@ -228,7 +234,13 @@ function validarDatos_(entrada) {
 
   campos.forEach(c => {
     let v = entrada[c.key];
-    v = (v === null || v === undefined) ? '' : String(v).trim().replace(/\s+/g, c.type === 'textarea' ? ' ' : ' ');
+    v = (v === null || v === undefined) ? '' : String(v).trim().replace(/\s+/g, ' ');
+    if (c.type === 'checkbox') v = (v === true || claveOpcion_(v) === 'SI' || v === 'true') ? 'SÍ' : 'NO';
+    else if (c.type !== 'email') v = v.toUpperCase();            // todo en MAYÚSCULAS salvo correos
+    if (c.options && v) {                                          // opción escrita de otra forma → valor oficial
+      const o = c.options.map(x => typeof x === 'string' ? x : x.v).filter(x => claveOpcion_(x) === claveOpcion_(v))[0];
+      if (o) v = o;
+    }
     d[c.key] = v;
   });
 
@@ -237,12 +249,23 @@ function validarDatos_(entrada) {
 
   // Especialidad según curso
   const conEsp = CONFIG.CURSOS_CON_ESPECIALIDAD.indexOf(d.curso) >= 0;
-  if (!conEsp) d.especialidad = 'No Aplica';
+  if (!conEsp) d.especialidad = 'NO APLICA';
+
+  // Profesión del padre / madre: opcionales
+  if (!d.profesionPadre) d.profesionPadre = 'NO APLICA';
+  if (!d.profesionMadre) d.profesionMadre = 'NO APLICA';
+
+  // Campos que no corresponden quedan vacíos
+  campos.forEach(c => { if (c.cond && !campoVisible_(c, d) && !c.virtual) d[c.key] = ''; });
+
+  // Procedencia: alumno antiguo → el liceo; 1° Medio nuevo → escuela elegida de la lista
+  if (d.alumnoAntiguo === 'SÍ') d.procedenciaEscuela = CONFIG.NOMBRE_LICEO_PROCEDENCIA;
 
   campos.forEach(c => {
     const v = d[c.key];
     if (c.key === 'edad') return;
     if (c.especialidad && !conEsp) return;
+    if (c.cond && !campoVisible_(c, d)) return;
     if (!v) { if (c.req) errores[c.key] = 'Campo obligatorio'; return; }
 
     if (c.options) {
@@ -250,7 +273,6 @@ function validarDatos_(entrada) {
       if (vals.indexOf(v) < 0) errores[c.key] = 'Seleccione una opción válida';
     }
     if (c.nombre && !/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ' .\-]{2,80}$/.test(v)) errores[c.key] = 'Solo letras (mínimo 2)';
-    else if (c.nombre) d[c.key] = capitalizar_(v);
 
     switch (c.type) {
       case 'rut': {
@@ -279,6 +301,13 @@ function validarDatos_(entrada) {
     if (v.length > 500) errores[c.key] = 'Texto demasiado largo';
   });
 
+  // 1° Medio, alumno nuevo: la procedencia es la escuela elegida en la lista
+  const cEsc = campos.filter(c => c.key === 'escuelaCalama')[0];
+  if (cEsc && campoVisible_(cEsc, d)) {
+    d.procedenciaEscuela = d.escuelaCalama;
+    if (errores.escuelaCalama) errores.procedenciaEscuela = errores.escuelaCalama;
+  }
+
   // Fecha de nacimiento y edad
   if (d.fechaNacimiento && !errores.fechaNacimiento) {
     const edad = calcularEdad_(d.fechaNacimiento);
@@ -291,7 +320,6 @@ function validarDatos_(entrada) {
   if (!errores.lugarQueOcupa && d.lugarQueOcupa && d.totalHijos && Number(d.lugarQueOcupa) > Number(d.totalHijos))
     errores.lugarQueOcupa = 'No puede ser mayor que el total de hijos';
 
-  // Correos distintos entre estudiante y titular no es obligatorio, pero sí que no estén vacíos (ya validado)
   return { ok: Object.keys(errores).length === 0, errores: errores, datos: d };
 }
 
