@@ -6,6 +6,13 @@ function configurarSistema() {
   const ss = ss_();
   const sh = hojaRegistros_();
 
+  // 0) Revisa que las columnas existentes estén en el orden que espera el sistema (si no, no toca nada)
+  verificarColumnas_(sh);
+
+  // 0b) Quita las reglas de validación antiguas de las columnas del sistema
+  //     (se vuelven a crear más abajo, en la columna correcta: estado y letra)
+  sh.getRange(2, 1, Math.max(sh.getMaxRows() - 1, 1), COLUMNAS.length).clearDataValidations();
+
   // 1) Encabezados: renombra "sexo" → "genero" y agrega las columnas nuevas
   crearEncabezados_(sh, COLUMNAS, '#1f4fa3');
 
@@ -105,6 +112,54 @@ function migrarDatosV3_(sh) {
   });
   if (cambiados) rango.setValues(filas);
   return cambiados;
+}
+
+/** Letra de columna de la hoja (1 → A, 27 → AA). */
+function letraColumna_(n) {
+  let s = '';
+  while (n > 0) { const m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = Math.floor((n - 1) / 26); }
+  return s;
+}
+
+/**
+ * Comprueba que cada encabezado existente esté en la columna que espera el sistema.
+ * Si alguien insertó, movió o borró columnas, se detiene con un mensaje claro y sin modificar datos.
+ */
+function verificarColumnas_(sh) {
+  const ancho = Math.max(sh.getLastColumn(), 1);
+  const cab = sh.getRange(1, 1, 1, ancho).getValues()[0].map(x => String(x).trim());
+  const problemas = [];
+  cab.forEach((h, i) => {
+    if (!h) return;
+    const k = h === 'sexo' ? 'genero' : h;
+    const j = COLUMNAS.indexOf(k);
+    if (j >= 0 && j !== i) problemas.push('• "' + h + '" está en la columna ' + letraColumna_(i + 1) + ' y debería estar en ' + letraColumna_(j + 1));
+    else if (j < 0 && i < COLUMNAS.length) problemas.push('• La columna ' + letraColumna_(i + 1) + ' tiene "' + h + '", pero el sistema usa esa columna para "' + COLUMNAS[i] + '"');
+  });
+  if (problemas.length) {
+    throw new Error('El orden de las columnas de la hoja "' + CONFIG.HOJA_REGISTROS + '" no coincide con el sistema. NO se modificó ningún dato.\n'
+      + problemas.slice(0, 12).join('\n') + (problemas.length > 12 ? '\n… y ' + (problemas.length - 12) + ' más' : '')
+      + '\nEjecute diagnosticarColumnas() para ver el detalle completo.');
+  }
+}
+
+/** Muestra en el registro de ejecución cada columna de la hoja y lo que espera el sistema. Solo lee. */
+function diagnosticarColumnas() {
+  const sh = hojaRegistros_();
+  const ancho = Math.max(sh.getLastColumn(), COLUMNAS.length);
+  const cab = sh.getRange(1, 1, 1, ancho).getValues()[0];
+  const filasMax = Math.max(sh.getMaxRows() - 1, 1);
+  const ultima = sh.getLastRow();
+  const ejemplo = ultima > 1 ? sh.getRange(ultima, 1, 1, ancho).getValues()[0] : [];
+  const lineas = [];
+  for (let i = 0; i < ancho; i++) {
+    const regla = sh.getRange(2, i + 1).getDataValidation();
+    const ok = String(cab[i]).trim() === (COLUMNAS[i] || '') ? '✅' : '❌';
+    lineas.push(ok + ' ' + letraColumna_(i + 1) + ': hoja="' + cab[i] + '" · sistema="' + (COLUMNAS[i] || '(ninguna)') + '"'
+      + ' · último registro="' + String(ejemplo[i] === undefined ? '' : ejemplo[i]).slice(0, 40) + '"'
+      + (regla ? ' · lista desplegable: ' + regla.getCriteriaValues()[0] : ''));
+  }
+  Logger.log('Filas de datos: ' + (sh.getLastRow() - 1) + ' · Filas totales: ' + (filasMax + 1) + '\n' + lineas.join('\n'));
 }
 
 /** Crea el administrador inicial con una contraseña al azar si la hoja Usuarios está vacía. */
