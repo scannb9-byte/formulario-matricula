@@ -301,3 +301,10 @@ select.estado-sel{min-width:132px}
   .tabla .acc .btn-ico{width:32px;height:32px}
 }
 .nro-mat{display:inline-block;margin-top:4px;padding:1px 7px;border-radius:999px;background:#fdf8d8;border:1px solid #e8d41c;color:#142c66;font-size:11.5px;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+/* ---- Versión 3: mayúsculas y campos condicionales ---- */
+input.control[type=text],textarea.control{text-transform:uppercase}
+input.control::placeholder,textarea.control::placeholder{text-transform:none}
+.control.fijo,.control[readonly].fijo{background:#f3f6fc;color:#1f4296;font-weight:600;border-style:dashed}
+.campo-check{justify-content:center}
+.check.destacado{padding:12px 14px;border:1px solid var(--azul-100);background:var(--azul-50);border-radius:10px;font-weight:600;color:var(--navy);line-height:1.35}
+.check.destacado input{flex:none}
