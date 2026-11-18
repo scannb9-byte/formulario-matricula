@@ -17,6 +17,15 @@ function fechaCL_(iso) {
   const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(iso || ''));
   return m ? m[3] + '-' + m[2] + '-' + m[1] : String(iso || '');
 }
+function sinTildes_(v) { return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().trim(); }
+function esNoAplica_(v) { return !v || sinTildes_(v) === 'NO APLICA'; }
+/** "FONASA · TRAMO B", "ISAPRE · COLMENA" */
+function saludTexto(r) {
+  const s = String(r.atencionSalud || '');
+  if (s === 'FONASA' && r.tramoFonasa) return 'FONASA · TRAMO ' + r.tramoFonasa;
+  if (s === 'ISAPRE' && r.isapre) return 'ISAPRE · ' + r.isapre;
+  return s;
+}
 function etiquetaOpcion(key, valor) {
   let c = null;
   ESQUEMA.forEach(p => p.secciones.forEach(s => s.campos.forEach(x => { if (x.key === key) c = x; })));
@@ -85,7 +94,8 @@ function fichaPartes_(r) {
     + 'font-size:7pt;line-height:9pt;font-weight:bold;color:#fff;background:' + (marcada ? P.azul : '#fff') + ';">' + (marcada ? 'X' : '') + '</span>';
   const siNo = k => {
     const x = r[k];
-    return chk(x === 'Sí') + '&nbsp;Sí&nbsp;&nbsp;&nbsp;&nbsp;' + chk(x === 'No') + '&nbsp;No';
+    const sn = sinTildes_(x);
+    return chk(sn === 'SI') + '&nbsp;SÍ&nbsp;&nbsp;&nbsp;&nbsp;' + chk(sn === 'NO') + '&nbsp;NO';
   };
 
   /** Cinta de colores del logo bajo el encabezado. */
@@ -159,12 +169,13 @@ function fichaPartes_(r) {
     + '<span style="display:inline-block;background:' + P.azulSuave + ';color:' + P.azul + ';font-size:6.6pt;font-weight:800;letter-spacing:1pt;padding:3pt 6pt;border-radius:2pt;">' + t + '</span></td>';
   a += grilla([
     '<tr>' + tipoAp('TITULAR') + celda('Nombre completo', v('nombreApoderadoTitular'), 4) + celda('Correo electrónico', v('correoApoderadoTitular'), 3) + celda('Teléfono', v('fonoApoderadoTitular'), 3) + '</tr>',
+    '<tr><td colspan="2" style="border-bottom:0.75pt solid ' + P.linea + ';"></td>' + celda('Profesión u oficio del apoderado titular', v('profesionApoderado'), 10) + '</tr>',
     '<tr>' + tipoAp('SUPLENTE') + celda('Nombre completo', v('nombreApoderadoSuplente'), 4) + celda('Correo electrónico', v('correoApoderadoSuplente'), 3) + celda('Teléfono', v('fonoApoderadoSuplente'), 3) + '</tr>'
   ]);
 
   a += seccion('3', 'INFORMACIÓN FAMILIAR');
   a += grilla([
-    fila([celda('Profesión u oficio del padre', v('profesionPadre'), 4), celda('Profesión u oficio de la madre', v('profesionMadre'), 4), celda('Profesión u oficio del apoderado', v('profesionApoderado'), 4)]),
+    fila([celda('Profesión u oficio del padre', v('profesionPadre'), 6), celda('Profesión u oficio de la madre', v('profesionMadre'), 6)]),
     fila([celda('Vive con', v('personaConQuienVive'), 3), celda('Total hijos en la familia', v('totalHijos'), 3), celda('Lugar que ocupa', v('lugarQueOcupa'), 3), celda('Personas en la casa', v('personasEnCasa'), 3)]),
     fila([celda('Domicilio', v('tipoDomicilio'), 4), celda('Situación económica (ingreso familiar)', v('situacionEconomica'), 8)])
   ]);
@@ -172,15 +183,15 @@ function fichaPartes_(r) {
   a += seccion('4', 'BENEFICIOS Y SALUD');
   a += grilla([
     fila([celda('Subsidio Único Familiar', siNo('subsidioUnicoFamiliar'), 3), celda('Beneficio JUNAEB', siNo('beneficioJunaeb'), 3), celda('Chile Solidario', siNo('chileSolidario'), 3), celda('Beca Indígena', siNo('becaIndigena'), 3)]),
-    fila([celda('Cuidados especiales o enfermedades', v('cuidadosEspeciales') || (lleno ? 'No declara' : ''), 5, 'height:40pt;vertical-align:top;'),
-          celda('Medicamentos contraindicados', v('medicamentosContraindicados') || (lleno ? 'No declara' : ''), 5, 'height:40pt;vertical-align:top;'),
-          celda('Sistema de salud', '<b>' + v('atencionSalud') + '</b>', 2, 'vertical-align:top;')])
+    fila([celda('Cuidados especiales o enfermedades', v('cuidadosEspeciales') || (lleno ? 'NO DECLARA' : ''), 5, 'height:40pt;vertical-align:top;'),
+          celda('Medicamentos contraindicados', v('medicamentosContraindicados') || (lleno ? 'NO DECLARA' : ''), 5, 'height:40pt;vertical-align:top;'),
+          celda('Sistema de salud', '<b>' + esc_(saludTexto(r)) + '</b>', 2, 'vertical-align:top;')])
   ]);
 
   a += seccion('5', 'EMERGENCIA E INFORMACIÓN ACADÉMICA');
   a += grilla([
     fila([celda('En caso de emergencia llamar a', v('contactoEmergencia'), 7), celda('Teléfono de emergencia', '<b>' + v('telefonoEmergencia') + '</b>', 5)]),
-    fila([celda('Establecimiento de procedencia', v('procedenciaEscuela'), 8), celda('Curso repetido (si aplica)', v('cursoRepetido') || (lleno ? 'No' : ''), 4)])
+    fila([celda('Establecimiento de procedencia', v('procedenciaEscuela'), 7), celda('Alumno antiguo', lleno ? (r.alumnoAntiguo === 'SÍ' ? '<b>SÍ</b>' : 'NO') : '', 2), celda('Curso repetido (si aplica)', v('cursoRepetido') || (lleno ? 'NO' : ''), 3)])
   ]);
 
   a += tabla('<tr><td style="' + SERIF + 'color:' + P.azul + ';font-size:9pt;font-style:italic;text-align:center;padding:9pt 30pt;line-height:1.45;">'
@@ -197,7 +208,7 @@ function fichaPartes_(r) {
   b += tabla(cols12 + fila([
     celda('Estudiante', '<b>' + (nombreCompleto || '&nbsp;') + '</b>', 5),
     celda('R.U.N.', v('run'), 2),
-    celda('Curso ' + anio, '<b style="color:' + P.azul + ';">' + cursoTxt + '</b>' + (r.especialidad && r.especialidad !== 'No Aplica' ? ' · ' + v('especialidad') : ''), 3),
+    celda('Curso ' + anio, '<b style="color:' + P.azul + ';">' + cursoTxt + '</b>' + (!esNoAplica_(r.especialidad) ? ' · ' + v('especialidad') : ''), 3),
     celda('N° matrícula', '<b>' + v('nroMatricula') + '</b>', 2, 'background:' + P.amarilloSuave + ';')
   ]), 'margin-top:8pt;');
 
@@ -315,7 +326,7 @@ function documentoNomina(regs, titulo) {
     + '<td>' + esc_([r.apellidoPaterno, r.apellidoMaterno].join(' ') + ', ' + r.nombres) + '</td>'
     + '<td class="nw">' + esc_(r.run) + '</td>'
     + '<td class="nw"><b style="color:#1f4296">' + esc_(cursoTexto(r)) + '</b></td>'
-    + '<td>' + esc_(r.especialidad === 'No Aplica' ? '—' : r.especialidad) + '</td>'
+    + '<td>' + esc_(esNoAplica_(r.especialidad) ? '—' : r.especialidad) + '</td>'
     + '<td>' + esc_(r.nombreApoderadoTitular) + '</td>'
     + '<td class="nw">' + esc_(r.fonoApoderadoTitular) + '</td>'
     + '<td>' + esc_(r.estado) + (r.nroMatricula ? '<br><small style="color:#142c66;font-weight:bold">' + esc_(r.nroMatricula) + '</small>' : '') + '</td>'

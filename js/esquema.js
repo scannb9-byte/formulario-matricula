@@ -24,6 +24,7 @@ const CFG = {
     "G",
     "H"
   ],
+  "liceoProcedencia": "LICEO BICENTENARIO POLITÉCNICO CESÁREO AGUIRRE GOYENECHEA",
   "estados": [
     "Pendiente",
     "Matriculado",
@@ -73,19 +74,19 @@ const ESQUEMA = [
             "options": [
               {
                 "v": "1°",
-                "t": "1° Medio"
+                "t": "1° MEDIO"
               },
               {
                 "v": "2°",
-                "t": "2° Medio"
+                "t": "2° MEDIO"
               },
               {
                 "v": "3°",
-                "t": "3° Medio"
+                "t": "3° MEDIO"
               },
               {
                 "v": "4°",
-                "t": "4° Medio"
+                "t": "4° MEDIO"
               }
             ]
           },
@@ -97,131 +98,131 @@ const ESQUEMA = [
             "options": [
               {
                 "v": "8°",
-                "t": "8° Básico"
+                "t": "8° BÁSICO"
               },
               {
                 "v": "1 A",
-                "t": "1° Medio A"
+                "t": "1° MEDIO A"
               },
               {
                 "v": "1 B",
-                "t": "1° Medio B"
+                "t": "1° MEDIO B"
               },
               {
                 "v": "1 C",
-                "t": "1° Medio C"
+                "t": "1° MEDIO C"
               },
               {
                 "v": "1 D",
-                "t": "1° Medio D"
+                "t": "1° MEDIO D"
               },
               {
                 "v": "1 E",
-                "t": "1° Medio E"
+                "t": "1° MEDIO E"
               },
               {
                 "v": "1 F",
-                "t": "1° Medio F"
+                "t": "1° MEDIO F"
               },
               {
                 "v": "1 G",
-                "t": "1° Medio G"
+                "t": "1° MEDIO G"
               },
               {
                 "v": "1 H",
-                "t": "1° Medio H"
+                "t": "1° MEDIO H"
               },
               {
                 "v": "2 A",
-                "t": "2° Medio A"
+                "t": "2° MEDIO A"
               },
               {
                 "v": "2 B",
-                "t": "2° Medio B"
+                "t": "2° MEDIO B"
               },
               {
                 "v": "2 C",
-                "t": "2° Medio C"
+                "t": "2° MEDIO C"
               },
               {
                 "v": "2 D",
-                "t": "2° Medio D"
+                "t": "2° MEDIO D"
               },
               {
                 "v": "2 E",
-                "t": "2° Medio E"
+                "t": "2° MEDIO E"
               },
               {
                 "v": "2 F",
-                "t": "2° Medio F"
+                "t": "2° MEDIO F"
               },
               {
                 "v": "2 G",
-                "t": "2° Medio G"
+                "t": "2° MEDIO G"
               },
               {
                 "v": "2 H",
-                "t": "2° Medio H"
+                "t": "2° MEDIO H"
               },
               {
                 "v": "3 A",
-                "t": "3° Medio A"
+                "t": "3° MEDIO A"
               },
               {
                 "v": "3 B",
-                "t": "3° Medio B"
+                "t": "3° MEDIO B"
               },
               {
                 "v": "3 C",
-                "t": "3° Medio C"
+                "t": "3° MEDIO C"
               },
               {
                 "v": "3 D",
-                "t": "3° Medio D"
+                "t": "3° MEDIO D"
               },
               {
                 "v": "3 E",
-                "t": "3° Medio E"
+                "t": "3° MEDIO E"
               },
               {
                 "v": "3 F",
-                "t": "3° Medio F"
+                "t": "3° MEDIO F"
               },
               {
                 "v": "3 G",
-                "t": "3° Medio G"
+                "t": "3° MEDIO G"
               },
               {
                 "v": "4 A",
-                "t": "4° Medio A"
+                "t": "4° MEDIO A"
               },
               {
                 "v": "4 B",
-                "t": "4° Medio B"
+                "t": "4° MEDIO B"
               },
               {
                 "v": "4 C",
-                "t": "4° Medio C"
+                "t": "4° MEDIO C"
               },
               {
                 "v": "4 D",
-                "t": "4° Medio D"
+                "t": "4° MEDIO D"
               },
               {
                 "v": "4 E",
-                "t": "4° Medio E"
+                "t": "4° MEDIO E"
               },
               {
                 "v": "4 F",
-                "t": "4° Medio F"
+                "t": "4° MEDIO F"
               },
               {
                 "v": "4 G",
-                "t": "4° Medio G"
+                "t": "4° MEDIO G"
               },
               {
                 "v": "4 H",
-                "t": "4° Medio H"
+                "t": "4° MEDIO H"
               }
             ]
           },
@@ -232,13 +233,13 @@ const ESQUEMA = [
             "req": true,
             "especialidad": true,
             "options": [
-              "Electricidad",
-              "Mecánica Industrial",
-              "Construcciones Metálicas",
-              "Mecánica Automotriz",
-              "Servicios de Hotelería"
+              "ELECTRICIDAD",
+              "MECÁNICA INDUSTRIAL",
+              "CONSTRUCCIONES METÁLICAS",
+              "MECÁNICA AUTOMOTRIZ",
+              "SERVICIOS DE HOTELERÍA"
             ],
-            "help": "Solo para 3° y 4° Medio. En 1° y 2° queda \"No Aplica\"."
+            "help": "Solo para 3° y 4° Medio. En 1° y 2° queda \"NO APLICA\"."
           }
         ]
       }
@@ -274,11 +275,11 @@ const ESQUEMA = [
           },
           {
             "key": "run",
-            "label": "RUN",
+            "label": "RUN o IPE (RUT provisorio)",
             "type": "rut",
             "req": true,
             "placeholder": "12345678-9",
-            "help": "Sin puntos y con guion. Se valida el dígito verificador."
+            "help": "Sin puntos y con guion. Acepta RUT provisorio (IPE), ej: 100844317-K."
           },
           {
             "key": "genero",
@@ -286,9 +287,9 @@ const ESQUEMA = [
             "type": "select",
             "req": true,
             "options": [
-              "Masculino",
-              "Femenino",
-              "Otro"
+              "MASCULINO",
+              "FEMENINO",
+              "OTRO"
             ]
           },
           {
@@ -317,14 +318,14 @@ const ESQUEMA = [
             "label": "País",
             "type": "text",
             "req": true,
-            "def": "Chile"
+            "def": "CHILE"
           },
           {
             "key": "nacionalidad",
             "label": "Nacionalidad",
             "type": "text",
             "req": true,
-            "def": "Chilena"
+            "def": "CHILENA"
           },
           {
             "key": "religion",
@@ -332,10 +333,10 @@ const ESQUEMA = [
             "type": "select",
             "req": true,
             "options": [
-              "Católica",
-              "Evangélica",
-              "Otra",
-              "Ninguna"
+              "CATÓLICA",
+              "EVANGÉLICA",
+              "OTRA",
+              "NINGUNA"
             ]
           },
           {
@@ -344,15 +345,15 @@ const ESQUEMA = [
             "type": "select",
             "req": true,
             "options": [
-              "Ninguna",
-              "Mapuche",
-              "Aymara",
-              "Quechua",
-              "Atacameño (Lickanantay)",
-              "Diaguita",
-              "Colla",
-              "Rapa Nui",
-              "Otra"
+              "NINGUNA",
+              "MAPUCHE",
+              "AYMARA",
+              "QUECHUA",
+              "ATACAMEÑO (LICKANANTAY)",
+              "DIAGUITA",
+              "COLLA",
+              "RAPA NUI",
+              "OTRA"
             ]
           },
           {
@@ -408,12 +409,35 @@ const ESQUEMA = [
             "type": "tel",
             "req": true,
             "placeholder": "9 1234 5678"
+          },
+          {
+            "key": "profesionApoderado",
+            "label": "Profesión u oficio del apoderado",
+            "type": "text",
+            "full": true
           }
         ]
       },
       {
         "titulo": "Apoderado Suplente",
-        "copiarTitular": true,
+        "copiar": {
+          "id": "copiarSuplente",
+          "label": "Mismos datos del apoderado titular",
+          "pares": [
+            [
+              "nombreApoderadoTitular",
+              "nombreApoderadoSuplente"
+            ],
+            [
+              "correoApoderadoTitular",
+              "correoApoderadoSuplente"
+            ],
+            [
+              "fonoApoderadoTitular",
+              "fonoApoderadoSuplente"
+            ]
+          ]
+        },
         "campos": [
           {
             "key": "nombreApoderadoSuplente",
@@ -451,20 +475,15 @@ const ESQUEMA = [
             "key": "profesionPadre",
             "label": "Profesión u oficio del padre",
             "type": "text",
-            "req": true,
-            "placeholder": "Si no aplica, escriba \"No aplica\""
+            "placeholder": "NO APLICA",
+            "help": "Opcional. Si lo deja en blanco queda \"NO APLICA\"."
           },
           {
             "key": "profesionMadre",
             "label": "Profesión u oficio de la madre",
             "type": "text",
-            "req": true,
-            "placeholder": "Si no aplica, escriba \"No aplica\""
-          },
-          {
-            "key": "profesionApoderado",
-            "label": "Profesión u oficio del apoderado",
-            "type": "text"
+            "placeholder": "NO APLICA",
+            "help": "Opcional. Si lo deja en blanco queda \"NO APLICA\"."
           },
           {
             "key": "personaConQuienVive",
@@ -472,12 +491,12 @@ const ESQUEMA = [
             "type": "select",
             "req": true,
             "options": [
-              "Ambos padres",
-              "Madre",
-              "Padre",
-              "Abuelos",
-              "Otro familiar",
-              "Otro"
+              "AMBOS PADRES",
+              "MADRE",
+              "PADRE",
+              "ABUELOS",
+              "OTRO FAMILIAR",
+              "OTRO"
             ]
           },
           {
@@ -510,10 +529,9 @@ const ESQUEMA = [
             "type": "select",
             "req": true,
             "options": [
-              "Propio",
-              "Arrendado",
-              "Cedido",
-              "Allegado"
+              "PROPIO",
+              "ARRENDADO",
+              "OTROS"
             ]
           },
           {
@@ -523,11 +541,11 @@ const ESQUEMA = [
             "req": true,
             "full": true,
             "options": [
-              "Alta(+ $900.000)",
-              "Media-Alta($701.000 - $900.000)",
-              "Media($501.000 - $700.000)",
-              "Media-Baja($301.000 - $500.000)",
-              "Baja(- $300.000)"
+              "ALTA(+ $900.000)",
+              "MEDIA-ALTA($701.000 - $900.000)",
+              "MEDIA($501.000 - $700.000)",
+              "MEDIA-BAJA($301.000 - $500.000)",
+              "BAJA(- $300.000)"
             ]
           }
         ]
@@ -547,8 +565,8 @@ const ESQUEMA = [
             "type": "select",
             "req": true,
             "options": [
-              "Sí",
-              "No"
+              "SÍ",
+              "NO"
             ]
           },
           {
@@ -557,8 +575,8 @@ const ESQUEMA = [
             "type": "select",
             "req": true,
             "options": [
-              "Sí",
-              "No"
+              "SÍ",
+              "NO"
             ]
           },
           {
@@ -567,8 +585,8 @@ const ESQUEMA = [
             "type": "select",
             "req": true,
             "options": [
-              "Sí",
-              "No"
+              "SÍ",
+              "NO"
             ]
           },
           {
@@ -577,8 +595,8 @@ const ESQUEMA = [
             "type": "select",
             "req": true,
             "options": [
-              "Sí",
-              "No"
+              "SÍ",
+              "NO"
             ]
           },
           {
@@ -589,7 +607,53 @@ const ESQUEMA = [
             "options": [
               "FONASA",
               "ISAPRE",
-              "Otro"
+              "OTRO"
+            ]
+          },
+          {
+            "key": "tramoFonasa",
+            "label": "Tramo FONASA",
+            "type": "select",
+            "req": true,
+            "cond": "fonasa",
+            "options": [
+              {
+                "v": "A",
+                "t": "TRAMO A"
+              },
+              {
+                "v": "B",
+                "t": "TRAMO B"
+              },
+              {
+                "v": "C",
+                "t": "TRAMO C"
+              },
+              {
+                "v": "D",
+                "t": "TRAMO D"
+              }
+            ],
+            "help": "Puede consultarlo en fonasa.gob.cl o en el certificado de afiliación."
+          },
+          {
+            "key": "isapre",
+            "label": "Isapre",
+            "type": "select",
+            "req": true,
+            "cond": "isapre",
+            "options": [
+              "BANMÉDICA",
+              "COLMENA",
+              "CONSALUD",
+              "CRUZBLANCA",
+              "ESENCIAL",
+              "NUEVA MASVIDA",
+              "VIDA TRES",
+              "CRUZ DEL NORTE",
+              "FUNDACIÓN (BANCOESTADO)",
+              "ISALUD",
+              "OTROS"
             ]
           },
           {
@@ -616,6 +680,20 @@ const ESQUEMA = [
     "secciones": [
       {
         "titulo": "Contacto de Emergencia",
+        "copiar": {
+          "id": "copiarEmergencia",
+          "label": "Usar datos del apoderado titular (nombre y teléfono)",
+          "pares": [
+            [
+              "nombreApoderadoTitular",
+              "contactoEmergencia"
+            ],
+            [
+              "fonoApoderadoTitular",
+              "telefonoEmergencia"
+            ]
+          ]
+        },
         "campos": [
           {
             "key": "contactoEmergencia",
@@ -637,11 +715,63 @@ const ESQUEMA = [
         "titulo": "Información Académica",
         "campos": [
           {
+            "key": "alumnoAntiguo",
+            "label": "Soy alumno antiguo del Liceo Bicentenario Politécnico Cesáreo Aguirre Goyenechea",
+            "type": "checkbox",
+            "full": true
+          },
+          {
+            "key": "escuelaCalama",
+            "label": "Escuela de procedencia (Calama)",
+            "type": "select",
+            "req": true,
+            "full": true,
+            "cond": "escuelaCalama",
+            "virtual": true,
+            "options": [
+              "COLEGIO ADVENTISTA DE CALAMA",
+              "COLEGIO CALAMA",
+              "COLEGIO ECOLÓGICO MONTESSORI",
+              "COLEGIO EVANGÉLICO EJÉRCITO DE SALVACIÓN CATHERINE BOOTH",
+              "COLEGIO JUAN PABLO II",
+              "COLEGIO LEONARDO DA VINCI",
+              "COLEGIO LICANCABUR",
+              "COLEGIO LOESS SCHOOL",
+              "COLEGIO NUESTRA SEÑORA DE AYQUINA",
+              "COLEGIO PADRE ALBERTO HURTADO",
+              "COLEGIO RÍO LOA",
+              "COLEGIO SAN IGNACIO",
+              "COLEGIO SAN NICOLÁS",
+              "ESCUELA 21 DE MAYO",
+              "ESCUELA ANDRÉS BELLO",
+              "ESCUELA CLAUDIO ARRAU",
+              "ESCUELA EMILIO SOTOMAYOR",
+              "ESCUELA JOHN F. KENNEDY",
+              "ESCUELA KAMAC MAYU",
+              "ESCUELA PEDRO VERGARA KELLER",
+              "ESCUELA PRESIDENTE BALMACEDA",
+              "ESCUELA PUKARA",
+              "ESCUELA REPÚBLICA DE BOLIVIA",
+              "ESCUELA REPÚBLICA DE CHILE",
+              "ESCUELA REPÚBLICA DE FRANCIA",
+              "ESCUELA REPÚBLICA DE GRECIA",
+              "ESCUELA SAN FRANCISCO",
+              "ESCUELA SAN JOSÉ",
+              "ESCUELA SEÑORA DE LA CANDELARIA",
+              "ESCUELA VADO DE TOPATER",
+              "ESCUELA VALENTÍN LETELIER",
+              "INSTITUTO OBISPO SILVA LEZAETA",
+              "OTROS"
+            ],
+            "help": "Si su escuela no aparece, elija OTROS."
+          },
+          {
             "key": "procedenciaEscuela",
             "label": "Escuela / colegio de procedencia",
             "type": "text",
             "req": true,
-            "full": true
+            "full": true,
+            "cond": "procedencia"
           },
           {
             "key": "cursoRepetido",

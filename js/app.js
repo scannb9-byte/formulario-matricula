@@ -101,8 +101,9 @@ function etiqueta(c,v){const o=opciones(c).filter(x=>x.v===v)[0];return o?o.t:v;
 function sumarAnios(iso,n){const d=new Date(iso+'T12:00:00');d.setFullYear(d.getFullYear()+n);return d.toISOString().slice(0,10);}
 
 function normRut(v){
+  // RUN (7-8 dígitos) o IPE / RUT provisorio escolar (9 dígitos, ej: 100844317-K)
   const s=String(v||'').toUpperCase().replace(/[^0-9K]/g,'');
-  if(s.length<8||s.length>9)return null;
+  if(s.length<8||s.length>10)return null;
   const cuerpo=s.slice(0,-1),dv=s.slice(-1);
   if(!/^\d+$/.test(cuerpo))return null;
   let suma=0,m=2;for(let i=cuerpo.length-1;i>=0;i--){suma+=Number(cuerpo[i])*m;m=m===7?2:m+1;}
@@ -112,16 +113,29 @@ function normRut(v){
 function normFono(v){let d=String(v||'').replace(/\D/g,'');if(d.length===11&&d.indexOf('56')===0)d=d.slice(2);if(d.length===8)d='9'+d;if(d.length!==9)return null;return '+56 '+d[0]+' '+d.slice(1,5)+' '+d.slice(5);}
 function emailOk(v){return /^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$/.test(String(v||'').trim());}
 function edadDe(iso){if(!/^\d{4}-\d{2}-\d{2}$/.test(iso||''))return null;const f=new Date(iso+'T12:00:00'),h=new Date();let e=h.getFullYear()-f.getFullYear();const m=h.getMonth()-f.getMonth();if(m<0||(m===0&&h.getDate()<f.getDate()))e--;return e;}
-function capitalizar(s){return String(s||'').trim().replace(/\s+/g,' ').toLowerCase().replace(/(^|[\s\-'])([a-záéíóúñü])/g,(m,a,b)=>a+b.toUpperCase());}
+function mayus(s){return String(s==null?'':s).replace(/\s+/g,' ').trim().toUpperCase();}
+function claveOp(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/\s+/g,' ').trim();}
+function esNoAplica(v){return !v||claveOp(v)==='NO APLICA';}
 function conEspecialidad(curso){return CFG.cursosConEspecialidad.indexOf(curso)>=0;}
+/** Misma regla que campoVisible_ en Config.gs. */
+function campoVisible(c,d){
+  switch(c.cond){
+    case 'fonasa':return d.atencionSalud==='FONASA';
+    case 'isapre':return d.atencionSalud==='ISAPRE';
+    case 'escuelaCalama':return d.curso==='1°'&&d.alumnoAntiguo!=='SÍ';
+    case 'procedencia':return !(d.curso==='1°'&&d.alumnoAntiguo!=='SÍ');
+  }
+  return true;
+}
 
 /** Devuelve '' si es válido o el mensaje de error. */
 function validarValor(c,v,ctx){
   v=String(v==null?'':v).trim();
-  if(c.key==='edad')return '';
+  if(c.key==='edad'||c.type==='checkbox')return '';
   if(c.especialidad&&!ctx.conEsp)return '';
+  if(c.cond&&ctx.d&&!campoVisible(c,ctx.d))return '';
   if(!v)return c.req?'Este campo es obligatorio':'';
-  if(c.options&&!opciones(c).some(o=>o.v===v))return 'Seleccione una opción válida';
+  if(c.options&&!opciones(c).some(o=>claveOp(o.v)===claveOp(v)))return 'Seleccione una opción válida';
   if(c.nombre&&!/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ' .\-]{2,80}$/.test(v))return 'Solo letras (mínimo 2)';
   switch(c.type){
     case 'rut':if(!normRut(v))return 'RUN inválido: revise el número y el dígito verificador';break;
@@ -145,10 +159,14 @@ function htmlCampo(c,pre){
   const ph=c.placeholder?' placeholder="'+esc(c.placeholder)+'"':'';
   const ro=c.readonly?' readonly tabindex="-1"':'';
   let ctrl;
+  if(c.type==='checkbox'){
+    return '<div class="campo campo-check'+(c.full?' full':'')+'" data-k="'+c.key+'"><label class="check destacado"><input type="checkbox" id="'+id+'" name="'+c.key+'"> '+esc(c.label)+'</label>'+
+      '<span class="msg-error"></span>'+(c.help?'<span class="ayuda">'+esc(c.help)+'</span>':'')+'</div>';
+  }
   if(c.type==='select'){
     ctrl='<select class="control" id="'+id+'" name="'+c.key+'"><option value="">Seleccione…</option>'+opciones(c).map(o=>'<option value="'+esc(o.v)+'">'+esc(o.t)+'</option>').join('')+'</select>';
   }else if(c.type==='textarea'){
-    ctrl='<textarea class="control" id="'+id+'" name="'+c.key+'" maxlength="500"'+ph+'></textarea>';
+    ctrl='<textarea class="control" id="'+id+'" name="'+c.key+'" maxlength="500" autocapitalize="characters"'+ph+'></textarea>';
   }else{
     const tipo={email:'email',tel:'tel',date:'date',number:'number'}[c.type]||'text';
     let extra='';
@@ -156,7 +174,7 @@ function htmlCampo(c,pre){
     if(c.type==='number')extra+=' inputmode="numeric"'+(c.min!=null?' min="'+c.min+'"':'')+(c.max!=null?' max="'+c.max+'"':'');
     if(c.type==='rut')extra+=' autocapitalize="characters" maxlength="12" spellcheck="false"';
     if(c.type==='email')extra+=' autocapitalize="none" spellcheck="false" maxlength="120"';
-    if(c.type==='text')extra+=' maxlength="150"';
+    if(c.type==='text')extra+=' maxlength="150" autocapitalize="characters"';
     if(c.nacimiento)extra+=' min="'+sumarAnios(CFG.hoy,-(CFG.edadMax+1))+'" max="'+sumarAnios(CFG.hoy,-CFG.edadMin)+'"';
     ctrl='<input class="control" id="'+id+'" name="'+c.key+'" type="'+tipo+'"'+extra+ph+ro+'>';
   }
@@ -165,7 +183,7 @@ function htmlCampo(c,pre){
 }
 function htmlSeccion(s,pre){
   return '<div class="seccion"><div class="seccion-tit"><h3>'+esc(s.titulo)+'</h3>'+
-    (s.copiarTitular?'<label class="check"><input type="checkbox" id="'+pre+'copiar"> Mismos datos del apoderado titular</label>':'')+
+    (s.copiar?'<label class="check"><input type="checkbox" class="copiar" id="'+pre+s.copiar.id+'"> '+esc(s.copiar.label)+'</label>':'')+
     '</div><div class="grid">'+s.campos.map(c=>htmlCampo(c,pre)).join('')+'</div></div>';
 }
 
@@ -173,25 +191,54 @@ function htmlSeccion(s,pre){
 function Formulario(raiz,pre){
   const F=this;
   F.el=k=>document.getElementById(pre+k);
-  F.get=k=>{const e=F.el(k);return e?String(e.value||'').trim():'';};
+  F.get=k=>{const e=F.el(k);if(!e)return '';if(e.type==='checkbox')return e.checked?'SÍ':'NO';return String(e.value||'').trim();};
   F.set=(k,v)=>{const e=F.el(k);if(!e)return;
-    if(e.tagName==='SELECT'&&v&&!Array.from(e.options).some(o=>o.value===v)){const o=document.createElement('option');o.value=v;o.textContent=v+' (valor anterior)';e.appendChild(o);}
+    if(e.type==='checkbox'){e.checked=claveOp(v)==='SI';return;}
+    if(e.tagName==='SELECT'&&v){ // acepta valores antiguos escritos de otra forma (ej: "Femenino" → "FEMENINO")
+      const o=Array.from(e.options).filter(x=>x.value&&claveOp(x.value)===claveOp(v))[0];
+      if(o)v=o.value;else{const n=document.createElement('option');n.value=v;n.textContent=v+' (valor anterior)';e.appendChild(n);}
+    }
     e.value=v==null?'':v;};
-  F.ctx=()=>({conEsp:conEspecialidad(F.get('curso')),totalHijos:F.get('totalHijos')});
+  F.crudos=()=>{const d={};CAMPOS.forEach(c=>d[c.key]=F.get(c.key));return d;};
+  F.ctx=()=>({conEsp:conEspecialidad(F.get('curso')),totalHijos:F.get('totalHijos'),d:F.crudos()});
   F.marcar=(k,msg)=>{const w=raiz.querySelector('.campo[data-k="'+k+'"]');if(!w)return;w.classList.toggle('error',!!msg);w.classList.toggle('ok',!msg&&!!F.get(k));w.querySelector('.msg-error').textContent=msg||'';};
   F.validar=keys=>{const ctx=F.ctx();let primero=null;
     keys.forEach(k=>{const c=CAMPO[k];if(!c)return;const m=validarValor(c,F.get(k),ctx);F.marcar(k,m);if(m&&!primero)primero=k;});
     return primero;};
-  F.datos=()=>{const d={};CAMPOS.forEach(c=>d[c.key]=F.get(c.key));
-    if(!conEspecialidad(d.curso))d.especialidad='No Aplica';
+  /** Datos listos para enviar: MAYÚSCULAS, valores por defecto y campos que no corresponden vacíos. */
+  F.datos=()=>{const d={};
+    CAMPOS.forEach(c=>{let v=F.get(c.key);if(c.type!=='email'&&c.type!=='checkbox')v=mayus(v);d[c.key]=v;});
+    if(!conEspecialidad(d.curso))d.especialidad='NO APLICA';
     if(d.run&&normRut(d.run))d.run=normRut(d.run);
+    if(!d.profesionPadre)d.profesionPadre='NO APLICA';
+    if(!d.profesionMadre)d.profesionMadre='NO APLICA';
+    CAMPOS.forEach(c=>{if(c.cond&&!campoVisible(c,d)&&!c.virtual)d[c.key]='';});
+    if(d.alumnoAntiguo==='SÍ')d.procedenciaEscuela=CFG.liceoProcedencia;
+    else if(campoVisible(CAMPO.escuelaCalama,d))d.procedenciaEscuela=d.escuelaCalama;
     return d;};
-  F.cargar=d=>{CAMPOS.forEach(c=>{if(d[c.key]!==undefined)F.set(c.key,(c.especialidad&&d[c.key]==='No Aplica')?'':d[c.key]);});F.actualizarEspecialidad();};
+  F.cargar=d=>{
+    CAMPOS.forEach(c=>{if(d[c.key]!==undefined)F.set(c.key,(c.especialidad&&esNoAplica(d[c.key]))?'':d[c.key]);});
+    // Escuela de la lista (1° Medio, alumno nuevo) a partir de la procedencia guardada
+    if(d.escuelaCalama===undefined&&d.procedenciaEscuela){const o=opciones(CAMPO.escuelaCalama).filter(x=>claveOp(x.v)===claveOp(d.procedenciaEscuela))[0];F.set('escuelaCalama',o?o.v:'');}
+    F.actualizarEspecialidad();F.actualizarVisibles();};
+  /** Muestra u oculta los campos condicionales (tramo FONASA, isapre, escuela de procedencia). */
+  F.actualizarVisibles=()=>{
+    const d=F.crudos();
+    CAMPOS.forEach(c=>{if(!c.cond)return;const w=raiz.querySelector('.campo[data-k="'+c.key+'"]');if(!w)return;
+      const vis=campoVisible(c,d);w.classList.toggle('oculto',!vis);if(!vis){w.classList.remove('error');w.querySelector('.msg-error').textContent='';}});
+    const p=F.el('procedenciaEscuela');
+    if(p){
+      const antiguo=d.alumnoAntiguo==='SÍ';
+      if(antiguo){p.value=CFG.liceoProcedencia;F.marcar('procedenciaEscuela','');}
+      else if(p.readOnly&&p.value===CFG.liceoProcedencia)p.value='';
+      p.readOnly=antiguo;p.classList.toggle('fijo',antiguo);
+    }
+  };
   F.actualizarEspecialidad=()=>{
     const ok=conEspecialidad(F.get('curso'));const w=raiz.querySelector('.campo[data-k="especialidad"]');
     if(w)w.classList.toggle('oculto',!ok);
     let aviso=raiz.querySelector('.aviso-esp');
-    if(!aviso&&w){aviso=document.createElement('div');aviso.className='campo aviso-esp';aviso.innerHTML='<label>Especialidad</label><div class="control" style="display:flex;align-items:center;background:#f6f8fb;color:#3c4659">No Aplica</div><span class="ayuda">1° y 2° Medio no eligen especialidad.</span>';w.parentNode.insertBefore(aviso,w.nextSibling);}
+    if(!aviso&&w){aviso=document.createElement('div');aviso.className='campo aviso-esp';aviso.innerHTML='<label>Especialidad</label><div class="control" style="display:flex;align-items:center;background:#f6f8fb;color:#3c4659">NO APLICA</div><span class="ayuda">1° y 2° Medio no eligen especialidad.</span>';w.parentNode.insertBefore(aviso,w.nextSibling);}
     if(aviso)aviso.classList.toggle('oculto',ok||!F.get('curso'));
     if(!ok)F.set('especialidad','');
   };
@@ -201,6 +248,8 @@ function Formulario(raiz,pre){
   raiz.addEventListener('change',ev=>{
     const k=ev.target.name;if(!k||!CAMPO[k])return;
     if(k==='curso'){F.actualizarEspecialidad();F.marcar('especialidad','');}
+    if(k==='curso'||k==='atencionSalud'||k==='alumnoAntiguo')F.actualizarVisibles();
+    if(CAMPO[k].type==='checkbox')return;
     if(k==='fechaNacimiento')F.actualizarEdad();
     if(raiz.querySelector('.campo[data-k="'+k+'"]').classList.contains('error')||ev.target.value)F.marcar(k,validarValor(CAMPO[k],F.get(k),F.ctx()));
   });
@@ -210,7 +259,7 @@ function Formulario(raiz,pre){
       if(c.type==='rut'&&normRut(v))F.set(k,normRut(v));
       if(c.type==='tel'&&normFono(v))F.set(k,normFono(v));
       if(c.type==='email')F.set(k,v.toLowerCase());
-      if(c.nombre)F.set(k,capitalizar(v));
+      if(c.type==='text'||c.type==='textarea')F.set(k,mayus(v));
     }
     if(F.get(k)||c.req&&raiz.querySelector('.campo[data-k="'+k+'"]').classList.contains('error'))F.marcar(k,validarValor(c,F.get(k),F.ctx()));
   });
@@ -222,12 +271,12 @@ function Formulario(raiz,pre){
     if(w&&w.classList.contains('error')){const m=validarValor(c,F.get(c.key),F.ctx());if(!m)F.marcar(c.key,'');}
     if(F.sincronizar)F.sincronizar();
   });
-  const cp=document.getElementById(pre+'copiar');
-  if(cp){
-    const pares=[['nombreApoderadoTitular','nombreApoderadoSuplente'],['correoApoderadoTitular','correoApoderadoSuplente'],['fonoApoderadoTitular','fonoApoderadoSuplente']];
-    F.sincronizar=()=>{if(!cp.checked)return;pares.forEach(p=>{F.set(p[1],F.get(p[0]));if(F.get(p[1]))F.marcar(p[1],'');});};
-    cp.addEventListener('change',()=>{pares.forEach(p=>{const e=F.el(p[1]);e.readOnly=cp.checked;});F.sincronizar();});
-  }
+  // Casillas "usar datos del apoderado titular" (suplente y contacto de emergencia)
+  const copias=[];
+  ESQUEMA.forEach(p=>p.secciones.forEach(s=>{if(!s.copiar)return;const cb=document.getElementById(pre+s.copiar.id);if(cb)copias.push({cb:cb,pares:s.copiar.pares});}));
+  F.sincronizar=()=>copias.forEach(x=>{if(!x.cb.checked)return;x.pares.forEach(p=>{F.set(p[1],mayusSi(p[1],F.get(p[0])));if(F.get(p[1]))F.marcar(p[1],'');});});
+  function mayusSi(k,v){return CAMPO[k]&&CAMPO[k].type==='text'?mayus(v):v;}
+  copias.forEach(x=>x.cb.addEventListener('change',()=>{x.pares.forEach(p=>{const e=F.el(p[1]);e.readOnly=x.cb.checked;e.classList.toggle('fijo',x.cb.checked);});F.sincronizar();}));
 }
 
 // ============================================================
@@ -260,9 +309,9 @@ function valoresPorDefecto(){
   CAMPOS.forEach(c=>FP.set(c.key,c.def||''));
   FP.set('fechaMatricula',CFG.hoy);
   $$('#form-matricula .campo').forEach(w=>{w.classList.remove('error','ok');});
-  const cp=$('#f-copiar');if(cp){cp.checked=false;cp.dispatchEvent(new Event('change'));}
+  $$('#form-matricula input.copiar').forEach(cp=>{cp.checked=false;cp.dispatchEvent(new Event('change'));});
   const dc=$('#declaro');if(dc)dc.checked=false;
-  FP.actualizarEspecialidad();
+  FP.actualizarEspecialidad();FP.actualizarVisibles();
 }
 
 function nuevoFormulario(inicial){
@@ -316,8 +365,8 @@ function pasoAnterior(){if(pasoActual>0)mostrarPaso(pasoActual-1);}
 
 function htmlResumen(d,conEditar){
   return ESQUEMA.map((p,i)=>p.secciones.map(s=>{
-    const filas=s.campos.map(c=>{
-      let v=d[c.key];if(c.especialidad&&!conEspecialidad(d.curso))v='No Aplica';
+    const filas=s.campos.filter(c=>!c.virtual&&(!c.cond||campoVisible(c,d))).map(c=>{
+      let v=d[c.key];if(c.especialidad&&!conEspecialidad(d.curso))v='NO APLICA';
       if(c.options)v=etiqueta(c,v);if(c.type==='date')v=fechaCL(v);
       return '<dt>'+esc(c.label)+'</dt><dd>'+(v?esc(v):'<span style="color:#98a2b3;font-weight:400">—</span>')+'</dd>';
     }).join('');
@@ -493,7 +542,7 @@ function calcularStats(){
     s.porCurso[r.curso||'—']=(s.porCurso[r.curso||'—']||0)+1;
     if(r.letra){const k=r.curso+'|'+r.letra;s.porCursoLetra[k]=(s.porCursoLetra[k]||0)+1;}
     else if(r.estado!=='Anulado')s.sinLetra++;
-    if(r.especialidad&&r.especialidad!=='No Aplica')s.porEspecialidad[r.especialidad]=(s.porEspecialidad[r.especialidad]||0)+1;
+    if(!esNoAplica(r.especialidad))s.porEspecialidad[r.especialidad]=(s.porEspecialidad[r.especialidad]||0)+1;
     s.porEstado[r.estado]=(s.porEstado[r.estado]||0)+1;
     if(r.emailEnviado!=='Sí')s.emailPendiente++;
   });
@@ -519,7 +568,7 @@ function filtroRapido(curso,letra){
 function llenarFiltros(){
   $('#flt-curso').innerHTML='<option value="">Todos los cursos</option>'+opciones(CAMPO.curso).map(o=>'<option value="'+esc(o.v)+'">'+esc(o.t)+'</option>').join('');
   $('#flt-letra').innerHTML='<option value="">Todas las letras</option><option value="-">Sin letra</option>'+CFG.letras.map(l=>'<option value="'+l+'">Letra '+l+'</option>').join('');
-  $('#flt-esp').innerHTML='<option value="">Todas las especialidades</option>'+opciones(CAMPO.especialidad).concat([{v:'No Aplica',t:'No Aplica'}]).map(o=>'<option value="'+esc(o.v)+'">'+esc(o.t)+'</option>').join('');
+  $('#flt-esp').innerHTML='<option value="">Todas las especialidades</option>'+opciones(CAMPO.especialidad).concat([{v:'NO APLICA',t:'NO APLICA'}]).map(o=>'<option value="'+esc(o.v)+'">'+esc(o.t)+'</option>').join('');
   $('#flt-estado').innerHTML='<option value="">Todos los estados</option>'+CFG.estados.map(e=>'<option>'+esc(e)+'</option>').join('');
   $('#sel-letra').innerHTML='<option value="">Elegir letra…</option>'+CFG.letras.map(l=>'<option value="'+l+'">Letra '+l+'</option>').join('')+'<option value="-">Quitar letra</option>';
   $$('.tabla th[data-o]').forEach(th=>th.addEventListener('click',()=>{const k=th.dataset.o;S.orden=S.orden.k===k?{k:k,dir:-S.orden.dir}:{k:k,dir:1};filtrar(true);}));
@@ -809,7 +858,7 @@ function borrarUsuario(i){
 //  INICIO
 // ============================================================
 // Columnas de la hoja (mismo orden que COLUMNAS en Config.gs); se actualiza con la respuesta del servidor.
-let COLUMNAS_REG=['timestamp','numRegistro','fechaMatricula','curso','cursoGestionPasada','especialidad','apellidoPaterno','apellidoMaterno','nombres','run','genero','fechaNacimiento','edad','lugarNacimiento','pais','nacionalidad','religion','etnia','celularEstudiante','correoEstudiante','domicilioEstudiante','nombreApoderadoTitular','correoApoderadoTitular','fonoApoderadoTitular','nombreApoderadoSuplente','correoApoderadoSuplente','fonoApoderadoSuplente','profesionPadre','profesionMadre','profesionApoderado','personaConQuienVive','totalHijos','lugarQueOcupa','personasEnCasa','tipoDomicilio','situacionEconomica','subsidioUnicoFamiliar','beneficioJunaeb','chileSolidario','becaIndigena','cuidadosEspeciales','medicamentosContraindicados','atencionSalud','contactoEmergencia','telefonoEmergencia','procedenciaEscuela','cursoRepetido','estado','nroMatricula','emailEnviado','fechaModificacion','modificadoPor','letra'];
+let COLUMNAS_REG=['timestamp','numRegistro','fechaMatricula','curso','cursoGestionPasada','especialidad','apellidoPaterno','apellidoMaterno','nombres','run','genero','fechaNacimiento','edad','lugarNacimiento','pais','nacionalidad','religion','etnia','celularEstudiante','correoEstudiante','domicilioEstudiante','nombreApoderadoTitular','correoApoderadoTitular','fonoApoderadoTitular','nombreApoderadoSuplente','correoApoderadoSuplente','fonoApoderadoSuplente','profesionPadre','profesionMadre','profesionApoderado','personaConQuienVive','totalHijos','lugarQueOcupa','personasEnCasa','tipoDomicilio','situacionEconomica','subsidioUnicoFamiliar','beneficioJunaeb','chileSolidario','becaIndigena','cuidadosEspeciales','medicamentosContraindicados','atencionSalud','contactoEmergencia','telefonoEmergencia','procedenciaEscuela','cursoRepetido','estado','nroMatricula','emailEnviado','fechaModificacion','modificadoPor','letra','tramoFonasa','isapre','alumnoAntiguo'];
 const VISTA_INICIAL=(new URLSearchParams(location.search).get('p')||'').toLowerCase();
 
 (function iniciar(){
