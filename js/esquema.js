@@ -266,6 +266,77 @@ const ESQUEMA = [
             ]
           }
         ]
+      },
+      {
+        "titulo": "Procedencia del Estudiante",
+        "campos": [
+          {
+            "key": "alumnoAntiguo",
+            "label": "Soy alumno antiguo del Liceo Bicentenario Politécnico Cesáreo Aguirre Goyenechea",
+            "type": "checkbox",
+            "full": true
+          },
+          {
+            "key": "escuelaCalama",
+            "label": "Escuela de procedencia (Calama)",
+            "type": "select",
+            "req": true,
+            "full": true,
+            "cond": "escuelaCalama",
+            "virtual": true,
+            "options": [
+              "COLEGIO ADVENTISTA DE CALAMA",
+              "COLEGIO CALAMA",
+              "COLEGIO ECOLÓGICO MONTESSORI",
+              "COLEGIO EVANGÉLICO EJÉRCITO DE SALVACIÓN CATHERINE BOOTH",
+              "COLEGIO JUAN PABLO II",
+              "COLEGIO LEONARDO DA VINCI",
+              "COLEGIO LICANCABUR",
+              "COLEGIO LOESS SCHOOL",
+              "COLEGIO NUESTRA SEÑORA DE AYQUINA",
+              "COLEGIO PADRE ALBERTO HURTADO",
+              "COLEGIO RÍO LOA",
+              "COLEGIO SAN IGNACIO",
+              "COLEGIO SAN NICOLÁS",
+              "ESCUELA 21 DE MAYO",
+              "ESCUELA ANDRÉS BELLO",
+              "ESCUELA CLAUDIO ARRAU",
+              "ESCUELA EMILIO SOTOMAYOR",
+              "ESCUELA JOHN F. KENNEDY",
+              "ESCUELA KAMAC MAYU",
+              "ESCUELA PEDRO VERGARA KELLER",
+              "ESCUELA PRESIDENTE BALMACEDA",
+              "ESCUELA PUKARA",
+              "ESCUELA REPÚBLICA DE BOLIVIA",
+              "ESCUELA REPÚBLICA DE CHILE",
+              "ESCUELA REPÚBLICA DE FRANCIA",
+              "ESCUELA REPÚBLICA DE GRECIA",
+              "ESCUELA SAN FRANCISCO",
+              "ESCUELA SAN JOSÉ",
+              "ESCUELA SEÑORA DE LA CANDELARIA",
+              "ESCUELA VADO DE TOPATER",
+              "ESCUELA VALENTÍN LETELIER",
+              "INSTITUTO OBISPO SILVA LEZAETA",
+              "OTROS"
+            ],
+            "help": "Si su escuela no aparece, elija OTROS."
+          },
+          {
+            "key": "procedenciaEscuela",
+            "label": "Escuela / colegio de procedencia",
+            "type": "text",
+            "req": true,
+            "full": true,
+            "cond": "procedencia"
+          },
+          {
+            "key": "cursoRepetido",
+            "label": "Curso que ha repetido (si aplica)",
+            "type": "text",
+            "full": true,
+            "placeholder": "Ej: 1° Medio. Déjelo en blanco si no ha repetido."
+          }
+        ]
       }
     ]
   },
@@ -720,77 +791,6 @@ const ESQUEMA = [
             "type": "tel",
             "req": true,
             "placeholder": "9 1234 5678"
-          }
-        ]
-      },
-      {
-        "titulo": "Información Académica",
-        "campos": [
-          {
-            "key": "alumnoAntiguo",
-            "label": "Soy alumno antiguo del Liceo Bicentenario Politécnico Cesáreo Aguirre Goyenechea",
-            "type": "checkbox",
-            "full": true
-          },
-          {
-            "key": "escuelaCalama",
-            "label": "Escuela de procedencia (Calama)",
-            "type": "select",
-            "req": true,
-            "full": true,
-            "cond": "escuelaCalama",
-            "virtual": true,
-            "options": [
-              "COLEGIO ADVENTISTA DE CALAMA",
-              "COLEGIO CALAMA",
-              "COLEGIO ECOLÓGICO MONTESSORI",
-              "COLEGIO EVANGÉLICO EJÉRCITO DE SALVACIÓN CATHERINE BOOTH",
-              "COLEGIO JUAN PABLO II",
-              "COLEGIO LEONARDO DA VINCI",
-              "COLEGIO LICANCABUR",
-              "COLEGIO LOESS SCHOOL",
-              "COLEGIO NUESTRA SEÑORA DE AYQUINA",
-              "COLEGIO PADRE ALBERTO HURTADO",
-              "COLEGIO RÍO LOA",
-              "COLEGIO SAN IGNACIO",
-              "COLEGIO SAN NICOLÁS",
-              "ESCUELA 21 DE MAYO",
-              "ESCUELA ANDRÉS BELLO",
-              "ESCUELA CLAUDIO ARRAU",
-              "ESCUELA EMILIO SOTOMAYOR",
-              "ESCUELA JOHN F. KENNEDY",
-              "ESCUELA KAMAC MAYU",
-              "ESCUELA PEDRO VERGARA KELLER",
-              "ESCUELA PRESIDENTE BALMACEDA",
-              "ESCUELA PUKARA",
-              "ESCUELA REPÚBLICA DE BOLIVIA",
-              "ESCUELA REPÚBLICA DE CHILE",
-              "ESCUELA REPÚBLICA DE FRANCIA",
-              "ESCUELA REPÚBLICA DE GRECIA",
-              "ESCUELA SAN FRANCISCO",
-              "ESCUELA SAN JOSÉ",
-              "ESCUELA SEÑORA DE LA CANDELARIA",
-              "ESCUELA VADO DE TOPATER",
-              "ESCUELA VALENTÍN LETELIER",
-              "INSTITUTO OBISPO SILVA LEZAETA",
-              "OTROS"
-            ],
-            "help": "Si su escuela no aparece, elija OTROS."
-          },
-          {
-            "key": "procedenciaEscuela",
-            "label": "Escuela / colegio de procedencia",
-            "type": "text",
-            "req": true,
-            "full": true,
-            "cond": "procedencia"
-          },
-          {
-            "key": "cursoRepetido",
-            "label": "Curso que ha repetido (si aplica)",
-            "type": "text",
-            "full": true,
-            "placeholder": "Ej: 1° Medio. Déjelo en blanco si no ha repetido."
           }
         ]
       }
