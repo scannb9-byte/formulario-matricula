@@ -125,8 +125,14 @@ function campoVisible(c,d){
     case 'isapre':return d.atencionSalud==='ISAPRE';
     case 'escuelaCalama':return d.curso==='1°'&&d.alumnoAntiguo!=='SÍ';
     case 'procedencia':return !(d.curso==='1°'&&d.alumnoAntiguo!=='SÍ');
+    case 'electivo':return conEspecialidad(d.curso);
   }
   return true;
+}
+/** Misma regla que campoBloqueado_ en Config.gs: en 3° y 4° la religión solo se elige si la asignatura es RELIGIÓN. */
+function campoBloqueado(c,d){
+  if(c.bloq==='religion')return conEspecialidad(d.curso)&&d.asignaturaElectiva!=='RELIGIÓN';
+  return false;
 }
 
 /** Devuelve '' si es válido o el mensaje de error. */
@@ -135,6 +141,7 @@ function validarValor(c,v,ctx){
   if(c.key==='edad'||c.type==='checkbox')return '';
   if(c.especialidad&&!ctx.conEsp)return '';
   if(c.cond&&ctx.d&&!campoVisible(c,ctx.d))return '';
+  if(c.bloq&&ctx.d&&campoBloqueado(c,ctx.d))return '';
   if(!v)return c.req?'Este campo es obligatorio':'';
   if(c.options&&!opciones(c).some(o=>claveOp(o.v)===claveOp(v)))return 'Seleccione una opción válida';
   if(c.nombre&&!/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ' .\-]{2,80}$/.test(v))return 'Solo letras (mínimo 2)';
@@ -164,7 +171,11 @@ function htmlCampo(c,pre){
     return '<div class="campo campo-check'+(c.full?' full':'')+'" data-k="'+c.key+'"><label class="check destacado"><input type="checkbox" id="'+id+'" name="'+c.key+'"> '+esc(c.label)+'</label>'+
       '<span class="msg-error"></span>'+(c.help?'<span class="ayuda">'+esc(c.help)+'</span>':'')+'</div>';
   }
-  if(c.type==='select'){
+  if(c.type==='radio'){
+    // Valor en un campo oculto (id/name del campo); los botones solo lo actualizan
+    ctrl='<input type="hidden" id="'+id+'" name="'+c.key+'" data-radio="1"><div class="radios" role="radiogroup">'+
+      opciones(c).map((o,i)=>'<label class="radio"><input type="radio" name="'+id+'__r" value="'+esc(o.v)+'" onchange="var h=document.getElementById(\''+id+'\');h.value=this.value;h.dispatchEvent(new Event(\'change\',{bubbles:true}))"><span>'+esc(o.t)+'</span></label>').join('')+'</div>';
+  }else if(c.type==='select'){
     ctrl='<select class="control" id="'+id+'" name="'+c.key+'"><option value="">Seleccione…</option>'+opciones(c).map(o=>'<option value="'+esc(o.v)+'">'+esc(o.t)+'</option>').join('')+'</select>';
   }else if(c.type==='textarea'){
     ctrl='<textarea class="control" id="'+id+'" name="'+c.key+'" maxlength="500" autocapitalize="characters"'+ph+'></textarea>';
@@ -195,6 +206,8 @@ function Formulario(raiz,pre){
   F.get=k=>{const e=F.el(k);if(!e)return '';if(e.type==='checkbox')return e.checked?'SÍ':'NO';return String(e.value||'').trim();};
   F.set=(k,v)=>{const e=F.el(k);if(!e)return;
     if(e.type==='checkbox'){e.checked=claveOp(v)==='SI';return;}
+    if(e.dataset.radio){const r=Array.from(raiz.querySelectorAll('input[name="'+e.id+'__r"]')).filter(x=>claveOp(x.value)===claveOp(v))[0];
+      raiz.querySelectorAll('input[name="'+e.id+'__r"]').forEach(x=>x.checked=x===r);e.value=r?r.value:'';return;}
     if(e.tagName==='SELECT'&&v){ // acepta valores antiguos escritos de otra forma (ej: "Femenino" → "FEMENINO")
       const o=Array.from(e.options).filter(x=>x.value&&claveOp(x.value)===claveOp(v))[0];
       if(o)v=o.value;else{const n=document.createElement('option');n.value=v;n.textContent=v+' (valor anterior)';e.appendChild(n);}
@@ -214,6 +227,7 @@ function Formulario(raiz,pre){
     if(!d.profesionPadre)d.profesionPadre='NO APLICA';
     if(!d.profesionMadre)d.profesionMadre='NO APLICA';
     CAMPOS.forEach(c=>{if(c.cond&&!campoVisible(c,d)&&!c.virtual)d[c.key]='';});
+    CAMPOS.forEach(c=>{if(c.bloq&&campoBloqueado(c,d))d[c.key]=d.asignaturaElectiva==='EDUCACIÓN FÍSICA'?'NO APLICA':'';});
     if(d.alumnoAntiguo==='SÍ')d.procedenciaEscuela=CFG.liceoProcedencia;
     else if(campoVisible(CAMPO.escuelaCalama,d))d.procedenciaEscuela=d.escuelaCalama;
     return d;};
@@ -227,6 +241,14 @@ function Formulario(raiz,pre){
     const d=F.crudos();
     CAMPOS.forEach(c=>{if(!c.cond)return;const w=raiz.querySelector('.campo[data-k="'+c.key+'"]');if(!w)return;
       const vis=campoVisible(c,d);w.classList.toggle('oculto',!vis);if(!vis){w.classList.remove('error');w.querySelector('.msg-error').textContent='';}});
+    // Religión: habilitada en 1° y 2°; en 3° y 4° solo si la asignatura es RELIGIÓN
+    const rel=F.el('religion');
+    if(rel){
+      const bloq=campoBloqueado(CAMPO.religion,d),ph=rel.options[0];
+      rel.disabled=bloq;rel.classList.toggle('fijo',bloq);
+      if(bloq){rel.value='';F.marcar('religion','');ph.textContent=d.asignaturaElectiva==='EDUCACIÓN FÍSICA'?'NO APLICA (EDUCACIÓN FÍSICA)':'Primero elija la asignatura';}
+      else ph.textContent='Seleccione…';
+    }
     const p=F.el('procedenciaEscuela');
     if(p){
       const antiguo=d.alumnoAntiguo==='SÍ';
@@ -249,7 +271,7 @@ function Formulario(raiz,pre){
   raiz.addEventListener('change',ev=>{
     const k=ev.target.name;if(!k||!CAMPO[k])return;
     if(k==='curso'){F.actualizarEspecialidad();F.marcar('especialidad','');}
-    if(k==='curso'||k==='atencionSalud'||k==='alumnoAntiguo')F.actualizarVisibles();
+    if(k==='curso'||k==='atencionSalud'||k==='alumnoAntiguo'||k==='asignaturaElectiva')F.actualizarVisibles();
     if(CAMPO[k].type==='checkbox')return;
     if(k==='fechaNacimiento')F.actualizarEdad();
     if(raiz.querySelector('.campo[data-k="'+k+'"]').classList.contains('error')||ev.target.value)F.marcar(k,validarValor(CAMPO[k],F.get(k),F.ctx()));

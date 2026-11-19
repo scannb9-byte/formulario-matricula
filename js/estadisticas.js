@@ -30,7 +30,10 @@ const DIMENSIONES = [
   { k: 'nacionalidad', t: 'Nacionalidad', val: r => esChileno(r) ? 'CHILENA' : vEst(r.nacionalidad), top: 8 },
   { k: 'extranjero', t: 'Chilenos y extranjeros', val: r => esChileno(r) ? 'CHILENOS' : 'EXTRANJEROS', orden: () => ['CHILENOS', 'EXTRANJEROS'] },
   { k: 'pais', t: 'País de nacimiento', val: r => vEst(r.pais), top: 8 },
-  { k: 'religion', t: 'Religión', val: r => vEst(r.religion) },
+  { k: 'religion', t: 'Religión', val: r => r.asignaturaElectiva === 'EDUCACIÓN FÍSICA' ? 'NO APLICA (ED. FÍSICA)' : vEst(r.religion),
+    orden: () => ['CATÓLICA', 'EVANGÉLICA', 'NINGUNA', 'NO APLICA (ED. FÍSICA)'] },
+  { k: 'asignaturaElectiva', t: 'Religión o Ed. Física (3° y 4°)', val: r => conEspecialidad(r.curso) ? vEst(r.asignaturaElectiva) : null,
+    orden: () => ['RELIGIÓN', 'EDUCACIÓN FÍSICA'] },
   { k: 'etnia', t: 'Pueblo originario / etnia', val: r => vEst(r.etnia) },
   { k: 'atencionSalud', t: 'Sistema de salud', val: r => vEst(r.atencionSalud), orden: () => ['FONASA', 'ISAPRE', 'OTRO'] },
   { k: 'tramoFonasa', t: 'Tramo FONASA', val: r => r.atencionSalud === 'FONASA' ? (r.tramoFonasa ? 'TRAMO ' + r.tramoFonasa : SIN_INFO) : null,
@@ -52,7 +55,7 @@ const DIMENSIONES = [
 const DIM = {}; DIMENSIONES.forEach(d => DIM[d.k] = d);
 
 // Tarjetas de gráficos del tablero (en este orden)
-const GRAFICOS = ['extranjero', 'nacionalidad', 'genero', 'edad', 'religion', 'etnia', 'especialidad', 'atencionSalud', 'tramoFonasa',
+const GRAFICOS = ['extranjero', 'nacionalidad', 'genero', 'edad', 'religion', 'asignaturaElectiva', 'etnia', 'especialidad', 'atencionSalud', 'tramoFonasa',
   'isapre', 'BENEFICIOS', 'situacionEconomica', 'tipoDomicilio', 'personaConQuienVive', 'alumnoAntiguo', 'procedenciaEscuela', 'cuidados', 'cursoLetra'];
 const BENEFICIOS = ['beneficioJunaeb', 'subsidioUnicoFamiliar', 'chileSolidario', 'becaIndigena'];
 
@@ -152,7 +155,7 @@ function tarjetaDim(regs, k) {
     filas = grupos.slice(0, d.top).concat([{ g: 'OTROS (' + resto.length + ')', n: resto.reduce((s, g) => s + g.n, 0), otros: true }]);
   }
   const max = Math.max(0, ...filas.map(g => g.n));
-  const nota = k === 'tramoFonasa' ? 'Solo estudiantes en FONASA' : k === 'isapre' ? 'Solo estudiantes en ISAPRE' : k === 'especialidad' ? 'Solo 3° y 4° Medio' : '';
+  const nota = k === 'tramoFonasa' ? 'Solo estudiantes en FONASA' : k === 'isapre' ? 'Solo estudiantes en ISAPRE' : (k === 'especialidad' || k === 'asignaturaElectiva') ? 'Solo 3° y 4° Medio' : '';
   const cuerpo = filas.length
     ? filas.map(g => filaBarra(g.g, g.n, base, max, g.otros ? 'irAReporte(\'' + k + '\',\'\')' : 'irAReporte(\'' + k + '\',' + JSON.stringify(g.g).replace(/"/g, '&quot;') + ')')).join('')
     : '<div class="eb-vacio">Sin datos con los filtros actuales</div>';
@@ -322,7 +325,7 @@ function imprimirInformeGeneral() {
     ['Alumnos nuevos', c(r => r.alumnoAntiguo !== 'SÍ')], ['FONASA', c(r => r.atencionSalud === 'FONASA')], ['Beneficio JUNAEB', c(r => claveOp(r.beneficioJunaeb) === 'SI')],
     ['Cuidados de salud', c(r => !!r.cuidadosEspeciales)], ['Matriculados', c(r => r.estado === 'Matriculado')]];
   let cuerpo = '<div class="kpis">' + kp.map(k => '<div class="kpi"><div class="k">' + k[0] + '</div><div class="v">' + k[1] + '</div><div class="s">' + (k[2] === '' ? 'total considerado' : fmtPct(k[1], t)) + '</div></div>').join('') + '</div>';
-  const dims = ['curso', 'cursoLetra', 'especialidad', 'genero', 'edad', 'extranjero', 'nacionalidad', 'pais', 'religion', 'etnia', 'atencionSalud', 'tramoFonasa', 'isapre',
+  const dims = ['curso', 'cursoLetra', 'especialidad', 'genero', 'edad', 'extranjero', 'nacionalidad', 'pais', 'religion', 'asignaturaElectiva', 'etnia', 'atencionSalud', 'tramoFonasa', 'isapre',
     'beneficioJunaeb', 'subsidioUnicoFamiliar', 'chileSolidario', 'becaIndigena', 'situacionEconomica', 'tipoDomicilio', 'personaConQuienVive', 'alumnoAntiguo', 'cuidados', 'medicamentos', 'estado'];
   cuerpo += '<div class="cols">' + dims.map(k => {
     let g = agrupar(regs, k); const base = g.reduce((s, x) => s + x.n, 0);

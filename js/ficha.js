@@ -160,7 +160,7 @@ function fichaPartes_(r) {
     fila([celda('Apellido paterno', '<b>' + v('apellidoPaterno') + '</b>', 4), celda('Apellido materno', '<b>' + v('apellidoMaterno') + '</b>', 4), celda('Nombres', '<b>' + v('nombres') + '</b>', 4)]),
     fila([celda('R.U.N.', '<b>' + v('run') + '</b>', 3), celda('Fecha de nacimiento', esc_(fechaCL_(r.fechaNacimiento)), 3), celda('Edad', v('edad'), 2), celda('Género', v('genero'), 4)]),
     fila([celda('Lugar de nacimiento (comuna)', v('lugarNacimiento'), 4), celda('País', v('pais'), 4), celda('Nacionalidad', v('nacionalidad'), 4)]),
-    fila([celda('Religión', v('religion'), 4), celda('Pueblo originario / etnia', v('etnia'), 4), celda('Celular', v('celularEstudiante'), 4)]),
+    fila([celda(r.asignaturaElectiva ? 'Religión / Ed. Física' : 'Religión', esc_(r.asignaturaElectiva === 'EDUCACIÓN FÍSICA' ? 'EDUCACIÓN FÍSICA' : (r.religion || '')), 4), celda('Pueblo originario / etnia', v('etnia'), 4), celda('Celular', v('celularEstudiante'), 4)]),
     fila([celda('Correo electrónico', v('correoEstudiante'), 5), celda('Domicilio', v('domicilioEstudiante'), 7)])
   ]);
 

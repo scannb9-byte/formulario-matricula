@@ -240,6 +240,30 @@ const ESQUEMA = [
               "SERVICIOS DE HOTELERÍA"
             ],
             "help": "Solo para 3° y 4° Medio. En 1° y 2° queda \"NO APLICA\"."
+          },
+          {
+            "key": "asignaturaElectiva",
+            "label": "Asignatura (3° y 4° Medio)",
+            "type": "radio",
+            "req": true,
+            "cond": "electivo",
+            "options": [
+              "RELIGIÓN",
+              "EDUCACIÓN FÍSICA"
+            ],
+            "help": "En 3° y 4° Medio se elige entre Religión y Educación Física."
+          },
+          {
+            "key": "religion",
+            "label": "Religión",
+            "type": "select",
+            "req": true,
+            "bloq": "religion",
+            "options": [
+              "CATÓLICA",
+              "EVANGÉLICA",
+              "NINGUNA"
+            ]
           }
         ]
       }
@@ -326,18 +350,6 @@ const ESQUEMA = [
             "type": "text",
             "req": true,
             "def": "CHILENA"
-          },
-          {
-            "key": "religion",
-            "label": "Religión",
-            "type": "select",
-            "req": true,
-            "options": [
-              "CATÓLICA",
-              "EVANGÉLICA",
-              "OTRA",
-              "NINGUNA"
-            ]
           },
           {
             "key": "etnia",
