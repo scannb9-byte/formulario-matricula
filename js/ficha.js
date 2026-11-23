@@ -61,7 +61,7 @@ const PALETA = {
 
 function fichaPartes_(r) {
   r = r || {};
-  const P = PALETA, anio = CFG.anio;
+  const P = PALETA, anio = 2026;
   const F = 'font-family:Arial,Helvetica,sans-serif;';
   const SERIF = 'font-family:Georgia,Times New Roman,serif;';
   const v = k => esc_(r[k] || '');
@@ -246,7 +246,7 @@ function fichaPartes_(r) {
   const hueco = '<td style="width:16%;"></td>';
   b += tabla('<tr>' + firma('FIRMA APODERADO(A)', 'Nombre: ' + (r.nombreApoderadoTitular ? v('nombreApoderadoTitular') : '_______________________'), 58) + hueco + firma('FIRMA PROFESOR(A)', 'Nombre: _______________________', 58) + '</tr>');
   b += '<div style="' + F + 'font-size:6.8pt;font-weight:700;color:' + P.azul + ';letter-spacing:1.4pt;padding-top:16pt;">REVISADO POR · UNIDAD DE MATRÍCULA</div>';
-  b += tabla('<tr>' + firma('NOMBRE', '&nbsp;', 40) + hueco + firma('FIRMA', 'Fecha: ____ / ____ / ' + anio-1, 40) + '</tr>');
+  b += tabla('<tr>' + firma('NOMBRE', '&nbsp;', 40) + hueco + firma('FIRMA', 'Fecha: ____ / ____ / ' + anio, 40) + '</tr>');
 
   b += tabla('<tr><td style="width:3pt;background:' + P.rojo + ';"></td><td style="' + F + 'background:#fdf1f1;color:#8f1a1f;font-size:8.2pt;font-weight:700;text-align:center;padding:7pt 10pt;">'
     + 'IMPORTANTE: La ficha de matrícula que no esté firmada por el Apoderado(a) y el Profesor(a) no tiene validez.</td></tr>', 'margin-top:16pt;');
