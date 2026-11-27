@@ -191,7 +191,7 @@ table.tabla{width:100%;border-collapse:separate;border-spacing:0;font-size:14px}
 .badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
 .b-Pendiente{background:var(--oro-50);color:#8a6300}
 .b-Matriculado{background:var(--verde-50);color:var(--verde)}
-.b-Anulado{background:#f2f4f7;color:#667085}
+.b-Anulado,.b-Retirado{background:#f2f4f7;color:#667085}
 .b-si{background:var(--verde-50);color:var(--verde)} .b-no{background:var(--rojo-50);color:var(--rojo)}
 select.estado-sel{height:30px;font-size:12.5px;border-radius:999px;padding:0 28px 0 10px;background-position:right 10px center;font-weight:600;border-width:1px}
 .paginacion{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;flex-wrap:wrap;font-size:13.5px;color:var(--muted)}
@@ -313,7 +313,7 @@ input.control::placeholder,textarea.control::placeholder{text-transform:none}
 .est-filtros>[data-i]{color:var(--azul);display:flex}
 .est-filtros select.control{width:auto;min-width:170px;height:38px;font-size:14px}
 .est-total{margin-left:auto;color:var(--muted);font-size:14px;font-variant-numeric:tabular-nums}
-.est-kpis{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.est-kpis{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:12px;margin-bottom:16px}
 .kpi{text-align:left;font:inherit;cursor:pointer;padding:14px 16px;border:1px solid var(--borde);transition:border-color .15s,box-shadow .15s}
 .kpi:hover{border-color:var(--azul-100);box-shadow:0 4px 14px rgba(31,66,150,.10)}
 .kpi .k{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.02em}
@@ -349,7 +349,8 @@ input.control::placeholder,textarea.control::placeholder{text-transform:none}
 .rep-opc{display:flex;flex-wrap:wrap;gap:8px 22px;margin:8px 0 4px}
 .rep-pie{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid var(--borde)}
 .rep-pie span{margin-right:auto;color:var(--muted);font-size:14px}
-@media (max-width:1280px){.est-kpis{grid-template-columns:repeat(4,1fr)}.est-grid{column-count:2}}
+@media (max-width:1440px){.est-kpis{grid-template-columns:repeat(5,1fr)}}
+@media (max-width:1280px){.est-kpis{grid-template-columns:repeat(3,1fr)}.est-grid{column-count:2}}
 @media (max-width:760px){
   .est-kpis{grid-template-columns:repeat(2,1fr)}.est-grid{column-count:1}.rep-tipos{grid-template-columns:1fr}
   .est-filtros select.control{flex:1 1 140px;min-width:0}.est-total{width:100%;margin-left:0}
