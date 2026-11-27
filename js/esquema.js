@@ -14,6 +14,7 @@ const CFG = {
   ],
   "edadMin": 11,
   "edadMax": 25,
+  "version": 7,
   "letras": [
     "A",
     "B",
@@ -28,7 +29,7 @@ const CFG = {
   "estados": [
     "Pendiente",
     "Matriculado",
-    "Anulado"
+    "Retirado"
   ],
   "roles": [
     {
@@ -261,8 +262,7 @@ const ESQUEMA = [
             "bloq": "religion",
             "options": [
               "CATÓLICA",
-              "EVANGÉLICA",
-              "NINGUNA"
+              "EVANGÉLICA"
             ]
           }
         ]
@@ -378,7 +378,7 @@ const ESQUEMA = [
           },
           {
             "key": "genero",
-            "label": "Género",
+            "label": "¿Con qué género te identificas?",
             "type": "select",
             "req": true,
             "options": [
@@ -459,6 +459,18 @@ const ESQUEMA = [
             "req": true,
             "full": true,
             "placeholder": "Calle, número, población/villa, comuna"
+          },
+          {
+            "key": "areaDomicilio",
+            "label": "Ubicación del domicilio",
+            "type": "radio",
+            "req": true,
+            "full": true,
+            "options": [
+              "DENTRO DEL ÁREA URBANA",
+              "FUERA DEL ÁREA URBANA"
+            ],
+            "help": "Fuera del área urbana: sector rural, pueblos o localidades fuera de la ciudad."
           }
         ]
       }
@@ -478,6 +490,14 @@ const ESQUEMA = [
             "req": true,
             "full": true,
             "nombre": true
+          },
+          {
+            "key": "runApoderadoTitular",
+            "label": "RUN del apoderado titular",
+            "type": "rut",
+            "req": true,
+            "placeholder": "12345678-9",
+            "help": "Sin puntos y con guion."
           },
           {
             "key": "correoApoderadoTitular",
@@ -512,6 +532,10 @@ const ESQUEMA = [
               "nombreApoderadoSuplente"
             ],
             [
+              "runApoderadoTitular",
+              "runApoderadoSuplente"
+            ],
+            [
               "correoApoderadoTitular",
               "correoApoderadoSuplente"
             ],
@@ -529,6 +553,14 @@ const ESQUEMA = [
             "req": true,
             "full": true,
             "nombre": true
+          },
+          {
+            "key": "runApoderadoSuplente",
+            "label": "RUN del apoderado suplente",
+            "type": "rut",
+            "req": true,
+            "placeholder": "12345678-9",
+            "help": "Sin puntos y con guion."
           },
           {
             "key": "correoApoderadoSuplente",
@@ -675,6 +707,16 @@ const ESQUEMA = [
           {
             "key": "becaIndigena",
             "label": "¿Beca Indígena?",
+            "type": "select",
+            "req": true,
+            "options": [
+              "SÍ",
+              "NO"
+            ]
+          },
+          {
+            "key": "pie",
+            "label": "¿Pertenece al PIE (Programa de Integración Escolar)?",
             "type": "select",
             "req": true,
             "options": [

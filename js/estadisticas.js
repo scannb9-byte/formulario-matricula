@@ -39,6 +39,9 @@ const DIMENSIONES = [
   { k: 'tramoFonasa', t: 'Tramo FONASA', val: r => r.atencionSalud === 'FONASA' ? (r.tramoFonasa ? 'TRAMO ' + r.tramoFonasa : SIN_INFO) : null,
     orden: () => ['TRAMO A', 'TRAMO B', 'TRAMO C', 'TRAMO D'] },
   { k: 'isapre', t: 'Isapre', val: r => r.atencionSalud === 'ISAPRE' ? vEst(r.isapre) : null },
+  { k: 'pie', t: 'PIE (Programa de Integración Escolar)', val: r => vEst(r.pie), orden: () => ['SÍ', 'NO'] },
+  { k: 'areaDomicilio', t: 'Ubicación del domicilio', val: r => vEst(r.areaDomicilio), orden: () => ['DENTRO DEL ÁREA URBANA', 'FUERA DEL ÁREA URBANA'] },
+  { k: 'aporte', t: 'Aporte voluntario', val: r => r.aporteMonto || r.aporteBoleta ? 'CON APORTE' : 'SIN APORTE', orden: () => ['CON APORTE', 'SIN APORTE'] },
   { k: 'cuidados', t: 'Cuidados especiales de salud', val: r => r.cuidadosEspeciales ? 'DECLARA' : 'NO DECLARA', orden: () => ['DECLARA', 'NO DECLARA'] },
   { k: 'medicamentos', t: 'Medicamentos contraindicados', val: r => r.medicamentosContraindicados ? 'DECLARA' : 'NO DECLARA', orden: () => ['DECLARA', 'NO DECLARA'] },
   { k: 'beneficioJunaeb', t: 'Beneficio JUNAEB', val: r => vEst(r.beneficioJunaeb), orden: () => ['SÍ', 'NO'] },
@@ -56,7 +59,7 @@ const DIM = {}; DIMENSIONES.forEach(d => DIM[d.k] = d);
 
 // Tarjetas de gráficos del tablero (en este orden)
 const GRAFICOS = ['extranjero', 'nacionalidad', 'genero', 'edad', 'religion', 'asignaturaElectiva', 'etnia', 'especialidad', 'atencionSalud', 'tramoFonasa',
-  'isapre', 'BENEFICIOS', 'situacionEconomica', 'tipoDomicilio', 'personaConQuienVive', 'alumnoAntiguo', 'procedenciaEscuela', 'cuidados', 'cursoLetra'];
+  'isapre', 'pie', 'BENEFICIOS', 'situacionEconomica', 'tipoDomicilio', 'areaDomicilio', 'personaConQuienVive', 'alumnoAntiguo', 'procedenciaEscuela', 'cuidados', 'aporte', 'cursoLetra'];
 const BENEFICIOS = ['beneficioJunaeb', 'subsidioUnicoFamiliar', 'chileSolidario', 'becaIndigena'];
 
 const E = { dim: 'curso', val: '' };
@@ -70,7 +73,7 @@ function registrosEst() {
     if (l === '-' && r.letra) return false;
     if (l && l !== '-' && r.letra !== l) return false;
     if (e === '*') return true;
-    if (!e) return r.estado !== 'Anulado';
+    if (!e) return r.estado !== 'Retirado';
     return r.estado === e;
   });
 }
@@ -101,7 +104,7 @@ function iniciarEstadisticas() {
   iniciarEstadisticas.listo = true;
   $('#est-curso').innerHTML = '<option value="">Todos los cursos</option>' + opciones(CAMPO.curso).map(o => '<option value="' + esc(o.v) + '">' + esc(o.t) + '</option>').join('');
   $('#est-letra').innerHTML = '<option value="">Todas las letras</option><option value="-">Sin letra</option>' + CFG.letras.map(l => '<option value="' + l + '">Letra ' + l + '</option>').join('');
-  $('#est-estado').innerHTML = '<option value="">Todos menos anulados</option><option value="*">Todos los estados</option>' + CFG.estados.map(e => '<option>' + esc(e) + '</option>').join('');
+  $('#est-estado').innerHTML = '<option value="">Todos menos retirados</option><option value="*">Todos los estados</option>' + CFG.estados.map(e => '<option>' + esc(e) + '</option>').join('');
   $('#rep-dim').innerHTML = DIMENSIONES.map(d => '<option value="' + d.k + '">' + esc(d.t) + '</option>').join('');
   ['#est-curso', '#est-letra', '#est-estado'].forEach(s => $(s).addEventListener('change', renderEstadisticas));
   $('#rep-dim').addEventListener('change', () => { E.dim = $('#rep-dim').value; E.val = ''; pintarSelectorGrupo(); });
@@ -124,12 +127,15 @@ function renderEstadisticas() {
     { t: 'Alumnos nuevos', n: cuenta(r => r.alumnoAntiguo !== 'SÍ'), dim: 'alumnoAntiguo', val: 'NUEVOS' },
     { t: 'FONASA', n: cuenta(r => r.atencionSalud === 'FONASA'), dim: 'atencionSalud', val: 'FONASA' },
     { t: 'Beneficio JUNAEB', n: cuenta(r => claveOp(r.beneficioJunaeb) === 'SI'), dim: 'beneficioJunaeb', val: 'SÍ' },
-    { t: 'Cuidados de salud', n: cuenta(r => !!r.cuidadosEspeciales), dim: 'cuidados', val: 'DECLARA' }
+    { t: 'Estudiantes PIE', n: cuenta(r => claveOp(r.pie) === 'SI'), dim: 'pie', val: 'SÍ' },
+    { t: 'Cuidados de salud', n: cuenta(r => !!r.cuidadosEspeciales), dim: 'cuidados', val: 'DECLARA' },
+    { t: 'Aporte voluntario', n: '$' + regs.reduce((s, r) => s + (Number(r.aporteMonto) || 0), 0).toLocaleString('es-CL'), dim: 'aporte', val: 'CON APORTE',
+      sub: cuenta(r => r.aporteMonto || r.aporteBoleta) + ' aportes' }
   ];
   $('#est-kpis').innerHTML = kpis.map((k, i) =>
     '<button class="card kpi" onclick="irAReporte(\'' + k.dim + '\',\'' + esc(k.val || '') + '\')" title="Ver reporte">' +
     '<div class="k">' + esc(k.t) + '</div><div class="v">' + k.n + '</div>' +
-    '<div class="s">' + (i === 0 ? esc(k.sub) : fmtPct(k.n, t) + ' del total') + '</div></button>').join('');
+    '<div class="s">' + (k.sub ? esc(k.sub) : fmtPct(k.n, t) + ' del total') + '</div></button>').join('');
 
   // Gráficos
   $('#est-graficos').innerHTML = GRAFICOS.map(k => k === 'BENEFICIOS' ? tarjetaBeneficios(regs) : tarjetaDim(regs, k)).join('');
@@ -281,6 +287,8 @@ function columnaDetalle(dimK) {
     case 'extranjero': case 'nacionalidad': case 'pais': return { t: 'Nacionalidad / país', v: r => [r.nacionalidad, r.pais].filter(Boolean).join(' · ') };
     case 'atencionSalud': case 'tramoFonasa': case 'isapre': return { t: 'Salud', v: r => saludTexto(r) };
     case 'procedenciaEscuela': case 'alumnoAntiguo': return { t: 'Procedencia', v: r => r.procedenciaEscuela };
+    case 'aporte': return { t: 'Boleta / monto', v: r => (r.aporteBoleta ? 'N° ' + r.aporteBoleta : '') + (r.aporteMonto ? ' · $' + Number(r.aporteMonto).toLocaleString('es-CL') : '') };
+    case 'areaDomicilio': return { t: 'Domicilio', v: r => r.domicilioEstudiante };
   }
   return null;
 }
@@ -326,7 +334,7 @@ function imprimirInformeGeneral() {
     ['Cuidados de salud', c(r => !!r.cuidadosEspeciales)], ['Matriculados', c(r => r.estado === 'Matriculado')]];
   let cuerpo = '<div class="kpis">' + kp.map(k => '<div class="kpi"><div class="k">' + k[0] + '</div><div class="v">' + k[1] + '</div><div class="s">' + (k[2] === '' ? 'total considerado' : fmtPct(k[1], t)) + '</div></div>').join('') + '</div>';
   const dims = ['curso', 'cursoLetra', 'especialidad', 'genero', 'edad', 'extranjero', 'nacionalidad', 'pais', 'religion', 'asignaturaElectiva', 'etnia', 'atencionSalud', 'tramoFonasa', 'isapre',
-    'beneficioJunaeb', 'subsidioUnicoFamiliar', 'chileSolidario', 'becaIndigena', 'situacionEconomica', 'tipoDomicilio', 'personaConQuienVive', 'alumnoAntiguo', 'cuidados', 'medicamentos', 'estado'];
+    'beneficioJunaeb', 'subsidioUnicoFamiliar', 'chileSolidario', 'becaIndigena', 'pie', 'situacionEconomica', 'tipoDomicilio', 'areaDomicilio', 'personaConQuienVive', 'alumnoAntiguo', 'cuidados', 'medicamentos', 'aporte', 'estado'];
   cuerpo += '<div class="cols">' + dims.map(k => {
     let g = agrupar(regs, k); const base = g.reduce((s, x) => s + x.n, 0);
     if (k === 'cursoLetra') g = g.filter(x => x.n);

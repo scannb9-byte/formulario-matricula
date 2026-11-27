@@ -61,7 +61,7 @@ const PALETA = {
 
 function fichaPartes_(r) {
   r = r || {};
-  const P = PALETA, anio = 2026;
+  const P = PALETA, anio = CFG.anio;
   const F = 'font-family:Arial,Helvetica,sans-serif;';
   const SERIF = 'font-family:Georgia,Times New Roman,serif;';
   const v = k => esc_(r[k] || '');
@@ -87,7 +87,7 @@ function fichaPartes_(r) {
     + '<td style="' + F + 'vertical-align:middle;padding:0 0 0 2pt;border-bottom:1.25pt solid ' + P.azul + ';">'
     + '<span style="font-size:9pt;font-weight:700;color:' + P.azul + ';letter-spacing:1.4pt;">' + titulo + '</span>'
     + (nota ? '<span style="font-size:6.8pt;color:' + P.gris + ';letter-spacing:0.3pt;font-style:italic;">&nbsp;&nbsp;' + nota + '</span>' : '')
-    + '</td></tr>', 'margin-top:11pt;');
+    + '</td></tr>', 'margin-top:8pt;');
 
   /** Casilla de verificación. */
   const chk = marcada => '<span style="display:inline-block;width:9pt;height:9pt;border:1pt solid ' + P.azul + ';border-radius:2pt;vertical-align:-1.5pt;text-align:center;'
@@ -136,7 +136,7 @@ function fichaPartes_(r) {
     + (lleno ? 'Pre-matrícula N° ' + v('numRegistro') + (r.nroMatricula ? ' · Matrícula ' + v('nroMatricula') : '') : 'Ficha de matrícula ' + anio) + '</td>'
     + '<td style="' + F + 'font-size:6.8pt;color:' + P.gris + ';padding-top:5pt;border-top:0.75pt solid ' + P.amarillo + ';text-align:center;">' + (lleno ? 'RUN ' + v('run') : '') + '</td>'
     + '<td style="' + F + 'font-size:6.8pt;color:' + P.gris + ';padding-top:5pt;border-top:0.75pt solid ' + P.amarillo + ';text-align:right;width:34%;">Página ' + pag + ' de 2</td>'
-    + '</tr>', 'margin-top:12pt;');
+    + '</tr>', 'margin-top:8pt;');
 
   // ============================ ANVERSO ============================
   let a = encabezado(false);
@@ -161,16 +161,16 @@ function fichaPartes_(r) {
     fila([celda('R.U.N.', '<b>' + v('run') + '</b>', 3), celda('Fecha de nacimiento', esc_(fechaCL_(r.fechaNacimiento)), 3), celda('Edad', v('edad'), 2), celda('Género', v('genero'), 4)]),
     fila([celda('Lugar de nacimiento (comuna)', v('lugarNacimiento'), 4), celda('País', v('pais'), 4), celda('Nacionalidad', v('nacionalidad'), 4)]),
     fila([celda(r.asignaturaElectiva ? 'Religión / Ed. Física' : 'Religión', esc_(r.asignaturaElectiva === 'EDUCACIÓN FÍSICA' ? 'EDUCACIÓN FÍSICA' : (r.religion || '')), 4), celda('Pueblo originario / etnia', v('etnia'), 4), celda('Celular', v('celularEstudiante'), 4)]),
-    fila([celda('Correo electrónico', v('correoEstudiante'), 5), celda('Domicilio', v('domicilioEstudiante'), 7)])
+    fila([celda('Correo electrónico', v('correoEstudiante'), 3), celda('Domicilio', v('domicilioEstudiante'), 5), celda('Ubicación del domicilio', v('areaDomicilio'), 4)])
   ]);
 
   a += seccion('2', 'APODERADOS');
   const tipoAp = t => '<td colspan="2" style="' + F + 'padding:5pt 4pt 3pt 7pt;vertical-align:bottom;border-bottom:0.75pt solid ' + P.linea + ';">'
     + '<span style="display:inline-block;background:' + P.azulSuave + ';color:' + P.azul + ';font-size:6.6pt;font-weight:800;letter-spacing:1pt;padding:3pt 6pt;border-radius:2pt;">' + t + '</span></td>';
   a += grilla([
-    '<tr>' + tipoAp('TITULAR') + celda('Nombre completo', v('nombreApoderadoTitular'), 4) + celda('Correo electrónico', v('correoApoderadoTitular'), 3) + celda('Teléfono', v('fonoApoderadoTitular'), 3) + '</tr>',
+    '<tr>' + tipoAp('TITULAR') + celda('Nombre completo', v('nombreApoderadoTitular'), 3) + celda('R.U.N.', v('runApoderadoTitular'), 2) + celda('Correo electrónico', v('correoApoderadoTitular'), 3) + celda('Teléfono', v('fonoApoderadoTitular'), 2) + '</tr>',
     '<tr><td colspan="2" style="border-bottom:0.75pt solid ' + P.linea + ';"></td>' + celda('Profesión u oficio del apoderado titular', v('profesionApoderado'), 10) + '</tr>',
-    '<tr>' + tipoAp('SUPLENTE') + celda('Nombre completo', v('nombreApoderadoSuplente'), 4) + celda('Correo electrónico', v('correoApoderadoSuplente'), 3) + celda('Teléfono', v('fonoApoderadoSuplente'), 3) + '</tr>'
+    '<tr>' + tipoAp('SUPLENTE') + celda('Nombre completo', v('nombreApoderadoSuplente'), 3) + celda('R.U.N.', v('runApoderadoSuplente'), 2) + celda('Correo electrónico', v('correoApoderadoSuplente'), 3) + celda('Teléfono', v('fonoApoderadoSuplente'), 2) + '</tr>'
   ]);
 
   a += seccion('3', 'INFORMACIÓN FAMILIAR');
@@ -182,9 +182,9 @@ function fichaPartes_(r) {
 
   a += seccion('4', 'BENEFICIOS Y SALUD');
   a += grilla([
-    fila([celda('Subsidio Único Familiar', siNo('subsidioUnicoFamiliar'), 3), celda('Beneficio JUNAEB', siNo('beneficioJunaeb'), 3), celda('Chile Solidario', siNo('chileSolidario'), 3), celda('Beca Indígena', siNo('becaIndigena'), 3)]),
-    fila([celda('Cuidados especiales o enfermedades', v('cuidadosEspeciales') || (lleno ? 'NO DECLARA' : ''), 5, 'height:40pt;vertical-align:top;'),
-          celda('Medicamentos contraindicados', v('medicamentosContraindicados') || (lleno ? 'NO DECLARA' : ''), 5, 'height:40pt;vertical-align:top;'),
+    fila([celda('Subsidio Único Familiar', siNo('subsidioUnicoFamiliar'), 3), celda('Beneficio JUNAEB', siNo('beneficioJunaeb'), 2), celda('Chile Solidario', siNo('chileSolidario'), 2), celda('Beca Indígena', siNo('becaIndigena'), 2), celda('PIE (Integración Escolar)', siNo('pie'), 3)]),
+    fila([celda('Cuidados especiales o enfermedades', v('cuidadosEspeciales') || (lleno ? 'NO DECLARA' : ''), 5, 'height:28pt;vertical-align:top;'),
+          celda('Medicamentos contraindicados', v('medicamentosContraindicados') || (lleno ? 'NO DECLARA' : ''), 5, 'height:28pt;vertical-align:top;'),
           celda('Sistema de salud', '<b>' + esc_(saludTexto(r)) + '</b>', 2, 'vertical-align:top;')])
   ]);
 
@@ -194,7 +194,7 @@ function fichaPartes_(r) {
     fila([celda('Establecimiento de procedencia', v('procedenciaEscuela'), 7), celda('Alumno antiguo', lleno ? (r.alumnoAntiguo === 'SÍ' ? '<b>SÍ</b>' : 'NO') : '', 2), celda('Curso repetido (si aplica)', v('cursoRepetido') || (lleno ? 'NO' : ''), 3)])
   ]);
 
-  a += tabla('<tr><td style="' + SERIF + 'color:' + P.azul + ';font-size:9pt;font-style:italic;text-align:center;padding:9pt 30pt;line-height:1.45;">'
+  a += tabla('<tr><td style="' + SERIF + 'color:' + P.azul + ';font-size:9pt;font-style:italic;text-align:center;padding:4pt 30pt;line-height:1.4;">'
     + '<span style="color:' + P.amarillo + ';font-size:12pt;">❝</span> ' + esc_(String(CFG.lema).replace(/^"|"$/g, '')) + ' <span style="color:' + P.amarillo + ';font-size:12pt;">❞</span></td></tr>', 'margin-top:10pt;');
   a += pie(1);
 
@@ -222,9 +222,14 @@ function fichaPartes_(r) {
       .map((d, i) => '<tr style="background:' + (i % 2 ? P.azulSuave : '#fff') + ';">' + tdT(d) + tdT(chk(false), '', c) + tdT(chk(false), '', c) + tdT('&nbsp;') + '</tr>').join(''), 'margin-top:6pt;');
   b += tabla('<tr>' + tdT('<span style="font-size:6.6pt;font-weight:700;color:' + P.azul + ';letter-spacing:0.8pt;">CERTIFICADOS DE ESTUDIOS</span>', '28%')
     + ['8° Básico', '1° Medio', '2° Medio', '3° Medio', '4° Medio'].map(x => tdT(chk(false) + '&nbsp; ' + x, '14.4%', 'white-space:nowrap;')).join('') + '</tr>');
-  b += tabla('<tr><td style="' + F + 'border:0.75pt solid ' + P.linea + ';border-radius:4pt;padding:5pt 7pt;height:48pt;vertical-align:top;font-size:6.4pt;font-weight:600;letter-spacing:0.6pt;color:' + P.gris + ';">OBSERVACIONES</td></tr>', 'margin-top:7pt;border-collapse:separate;');
+  // Aporte voluntario (lo registra el personal en el panel)
+  const monto = r.aporteMonto ? '$' + Number(r.aporteMonto).toLocaleString('es-CL') : '';
+  b += tabla(cols12 + fila([
+    '<td colspan="3" style="' + F + 'padding:7pt 7pt 3pt 0;vertical-align:bottom;font-size:6.6pt;font-weight:700;color:' + P.azul + ';letter-spacing:0.8pt;border-bottom:0.75pt solid ' + P.linea + ';">APORTE VOLUNTARIO</td>',
+    celda('N° de boleta', '<b>' + v('aporteBoleta') + '</b>', 4), celda('Monto', '<b>' + esc_(monto) + '</b>', 5)]), 'margin-top:4pt;');
+  b += tabla('<tr><td style="' + F + 'border:0.75pt solid ' + P.linea + ';border-radius:4pt;padding:5pt 7pt;height:34pt;vertical-align:top;font-size:6.4pt;font-weight:600;letter-spacing:0.6pt;color:' + P.gris + ';">OBSERVACIONES</td></tr>', 'margin-top:7pt;border-collapse:separate;');
 
-  b += seccion('7', 'RECEPCIÓN DE DOCUMENTOS POR PARTE DEL APODERADO');
+  b += seccion('7', 'RECEPCIÓN Y ACEPTACIÓN DE DOCUMENTOS POR PARTE DEL APODERADO');
   b += tabla('<tr>' + tdT(chk(false) + '&nbsp;&nbsp;Manual de Convivencia Escolar', '50%') + tdT(chk(false) + '&nbsp;&nbsp;Reglamento de Evaluación', '50%') + '</tr>'
     + '<tr>' + tdT(chk(false) + '&nbsp;&nbsp;Reglamento de Práctica') + tdT(chk(false) + '&nbsp;&nbsp;Reglamento Postulación Especialidades') + '</tr>', 'margin-top:2pt;');
 
@@ -244,12 +249,12 @@ function fichaPartes_(r) {
     + '<div style="border-top:1pt solid ' + P.azulOsc + ';padding-top:4pt;font-size:8.6pt;font-weight:700;color:' + P.azulOsc + ';letter-spacing:0.8pt;">' + t + '</div>'
     + '<div style="font-size:7pt;color:' + P.gris + ';margin-top:2pt;">' + sub + '</div></td>';
   const hueco = '<td style="width:16%;"></td>';
-  b += tabla('<tr>' + firma('FIRMA APODERADO(A)', 'Nombre: ' + (r.nombreApoderadoTitular ? v('nombreApoderadoTitular') : '_______________________'), 58) + hueco + firma('FIRMA PROFESOR(A)', 'Nombre: _______________________', 58) + '</tr>');
-  b += '<div style="' + F + 'font-size:6.8pt;font-weight:700;color:' + P.azul + ';letter-spacing:1.4pt;padding-top:16pt;">REVISADO POR · UNIDAD DE MATRÍCULA</div>';
-  b += tabla('<tr>' + firma('NOMBRE', '&nbsp;', 40) + hueco + firma('FIRMA', 'Fecha: ____ / ____ / ' + anio, 40) + '</tr>');
+  b += tabla('<tr>' + firma('FIRMA APODERADO(A)', 'Nombre: ' + (r.nombreApoderadoTitular ? v('nombreApoderadoTitular') : '_______________________'), 46) + hueco + firma('FIRMA PROFESOR(A)', 'Nombre: _______________________', 46) + '</tr>');
+  b += '<div style="' + F + 'font-size:6.8pt;font-weight:700;color:' + P.azul + ';letter-spacing:1.4pt;padding-top:12pt;">REVISADO POR · UNIDAD DE MATRÍCULA</div>';
+  b += tabla('<tr>' + firma('NOMBRE', '&nbsp;', 32) + hueco + firma('FIRMA Y TIMBRE', 'Fecha: ____ / ____ / ' + anio, 32) + '</tr>');
 
   b += tabla('<tr><td style="width:3pt;background:' + P.rojo + ';"></td><td style="' + F + 'background:#fdf1f1;color:#8f1a1f;font-size:8.2pt;font-weight:700;text-align:center;padding:7pt 10pt;">'
-    + 'IMPORTANTE: La ficha de matrícula que no esté firmada por el Apoderado(a) y el Profesor(a) no tiene validez.</td></tr>', 'margin-top:16pt;');
+    + 'IMPORTANTE: La ficha de matrícula que no esté firmada por el Apoderado(a) y el Profesor(a) no tiene validez.</td></tr>', 'margin-top:10pt;');
   b += pie(2);
 
   return { anverso: a, reverso: b };

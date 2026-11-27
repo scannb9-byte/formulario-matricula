@@ -57,7 +57,7 @@ CFG.formularioAbierto=true;
 // ---------- API (Apps Script) ----------
 // Nombres de los parámetros de cada acción, en el mismo orden en que se llaman abajo.
 const API_ARGS={
-  ping:[],enviarFormulario:['datos'],iniciarSesion:['usuario','password'],cerrarSesion:['token'],sesionActual:['token'],
+  ping:[],verificarRun:['run'],enviarFormulario:['datos'],iniciarSesion:['usuario','password'],cerrarSesion:['token'],sesionActual:['token'],
   cambiarMiPassword:['token','actual','nueva'],listarUsuarios:['token'],guardarUsuario:['token','usuario'],eliminarUsuario:['token','usuario'],
   obtenerRegistros:['token'],actualizarRegistro:['token','num','datos'],cambiarEstado:['token','num','estado','nroMatricula'],
   asignarCurso:['token','nums','letra'],eliminarRegistro:['token','num'],reenviarCorreo:['token','num']
@@ -321,6 +321,8 @@ function construirFormularioPublico(){
   const pasos=ESQUEMA.map(p=>p.paso).concat(['Revisión']);
   $('#stepper').innerHTML=pasos.map((t,i)=>'<button type="button" class="step" data-s="'+i+'" onclick="irPaso('+i+',true)"><div class="bar"></div><div class="lbl"><span class="num">'+(i+1)+'</span>'+esc(t)+'</div></button>').join('');
   FP=new Formulario($('#form-matricula'),'f-');
+  // RUN: avisa apenas se escribe si ya tiene pre-matrícula (sin esperar al último paso)
+  FP.el('run').addEventListener('change',()=>{if(normRut(FP.get('run')))verificarRunServidor();});
   $('#form-matricula').addEventListener('submit',enviarFormulario);
   $('#form-matricula').addEventListener('input',guardarBorrador);
   $('#form-matricula').addEventListener('change',guardarBorrador);
@@ -360,7 +362,8 @@ function camposDelPaso(i){const ks=[];if(ESQUEMA[i])ESQUEMA[i].secciones.forEach
 
 function irPaso(i,desdeStepper){
   if(desdeStepper&&i>pasoActual){ // no saltar pasos sin validar
-    for(let k=pasoActual;k<i;k++){const e=FP.validar(camposDelPaso(k));if(e){mostrarPaso(k);enfocar(e);toast('Complete los campos obligatorios de este paso.','err');return;}}
+    for(let k=pasoActual;k<i;k++){const e=FP.validar(camposDelPaso(k));if(e){mostrarPaso(k);enfocar(e);toast('Complete los campos obligatorios de este paso.','err');return;}
+      const rc=RUN_CACHE[normRut(FP.get('run'))];if(camposDelPaso(k).indexOf('run')>=0&&rc&&rc.existe){mostrarPaso(k);marcarRun(rc);enfocar('run');return;}}
   }
   mostrarPaso(i);
 }
@@ -379,10 +382,36 @@ function mostrarPaso(i){
   if(window.scrollY>top)window.scrollTo({top:top,behavior:'smooth'});
 }
 function enfocar(k){const e=FP.el(k);if(e){e.focus({preventScroll:true});e.scrollIntoView({behavior:'smooth',block:'center'});}}
+// ---------- Verificación inmediata en el servidor (RUN ya registrado) ----------
+const RUN_CACHE={};   // run normalizado → {existe, mensaje}
+function verificarRunServidor(){
+  const run=normRut(FP.get('run'));
+  if(!run)return Promise.resolve(true);                    // el formato ya lo valida el navegador
+  if(RUN_CACHE[run])return Promise.resolve(marcarRun(RUN_CACHE[run]));
+  return api('verificarRun',run).then(r=>{
+    if(!r||!r.ok)return true;                              // si el servidor no responde bien, se revisa al enviar
+    RUN_CACHE[run]={existe:!!r.existe,mensaje:r.mensaje||''};
+    return marcarRun(RUN_CACHE[run]);
+  }).catch(()=>true);                                      // sin conexión: no bloquea, se revisa al enviar
+}
+function marcarRun(x){
+  if(x.existe){FP.marcar('run','Este RUN ya tiene una pre-matrícula');toast(x.mensaje||'Este RUN ya tiene una pre-matrícula registrada.','err');return false;}
+  return true;
+}
+let validandoPaso=false;
 function pasoSiguiente(){
+  if(validandoPaso)return;
   const e=FP.validar(camposDelPaso(pasoActual));
   if(e){enfocar(e);toast('Revise los campos marcados en rojo.','err');return;}
-  mostrarPaso(pasoActual+1);guardarBorrador();
+  const conRun=camposDelPaso(pasoActual).indexOf('run')>=0;
+  if(!conRun){mostrarPaso(pasoActual+1);guardarBorrador();return;}
+  const b=$('#btn-sig'),txt=b.innerHTML;
+  validandoPaso=true;b.disabled=true;b.innerHTML='Verificando RUN…';
+  verificarRunServidor().then(ok=>{
+    validandoPaso=false;b.disabled=false;b.innerHTML=txt;
+    if(!ok){enfocar('run');return;}
+    mostrarPaso(pasoActual+1);guardarBorrador();
+  });
 }
 function pasoAnterior(){if(pasoActual>0)mostrarPaso(pasoActual-1);}
 
@@ -555,7 +584,7 @@ function cargarPanel(){
     const vivos=new Set(S.registros.map(x=>x.numRegistro));S.sel.forEach(n=>{if(!vivos.has(n))S.sel.delete(n);});
     const bp=$('#btn-planilla');bp.classList.toggle('oculto',!r.urlPlanilla);if(r.urlPlanilla)bp.href=r.urlPlanilla;
     $('#panel-sub').textContent='Gestión de fichas '+CFG.anio+' · actualizado '+new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
-    calcularStats();filtrar(true);
+    calcularStats();filtrar(true);avisoVersion();
   }).catch(errorRed);
 }
 function calcularStats(){
@@ -565,7 +594,7 @@ function calcularStats(){
     if(r.timestamp.indexOf(hoy)===0)s.hoy++;
     s.porCurso[r.curso||'—']=(s.porCurso[r.curso||'—']||0)+1;
     if(r.letra){const k=r.curso+'|'+r.letra;s.porCursoLetra[k]=(s.porCursoLetra[k]||0)+1;}
-    else if(r.estado!=='Anulado')s.sinLetra++;
+    else if(r.estado!=='Retirado')s.sinLetra++;
     if(!esNoAplica(r.especialidad))s.porEspecialidad[r.especialidad]=(s.porEspecialidad[r.especialidad]||0)+1;
     s.porEstado[r.estado]=(s.porEstado[r.estado]||0)+1;
     if(r.emailEnviado!=='Sí')s.emailPendiente++;
@@ -656,6 +685,12 @@ function pintarTabla(){
   pintarSeleccion();
 }
 
+function avisoVersion(){
+  const p=$('#v-panel');if(!S.versionDistinta||!p||$('#aviso-version'))return;
+  const d=document.createElement('div');d.id='aviso-version';d.className='aviso err';d.style.margin='0 0 14px';
+  d.innerHTML='<span data-i="alerta"></span><div><b>Versiones distintas.</b> '+esc(S.versionDistinta)+'</div>';
+  const w=p.querySelector('.panel-wrap')||p.firstElementChild;w.insertBefore(d,w.firstChild);pintarIconos(d);
+}
 function regLocal(n){return S.registros.filter(r=>r.numRegistro===String(n))[0];}
 
 // ---------- Selección múltiple ----------
@@ -718,7 +753,8 @@ function cambiarEstadoRapido(n,sel){
 function verRegistro(n){
   const d=regLocal(n);if(!d)return toast('Registro no encontrado. Actualice el panel.','err');
   const info='<div class="aviso info" style="margin-bottom:16px;flex-wrap:wrap"><span data-i="info"></span><div>Recibida el <b>'+esc(d.timestamp)+'</b> · Curso: <b>'+esc(cursoTexto(d))+'</b> · Estado: <span class="badge b-'+esc(d.estado)+'">'+esc(d.estado)+'</span>'+
-    (d.nroMatricula?' · N° Matrícula: <b>'+esc(d.nroMatricula)+'</b>':'')+' · Correo: <b>'+esc(d.emailEnviado||'No')+'</b>'+
+    (d.nroMatricula?' · N° Matrícula: <b>'+esc(d.nroMatricula)+'</b>':'')+
+    (d.aporteBoleta||d.aporteMonto?' · Aporte voluntario: <b>'+(d.aporteMonto?'$'+Number(d.aporteMonto).toLocaleString('es-CL'):'')+(d.aporteBoleta?' (boleta N° '+esc(d.aporteBoleta)+')':'')+'</b>':'')+' · Correo: <b>'+esc(d.emailEnviado||'No')+'</b>'+
     (d.modificadoPor?'<br><span style="font-size:13px">Última modificación: '+esc(d.fechaModificacion)+' por '+esc(d.modificadoPor)+'</span>':'')+'</div></div>';
   abrirModal({titulo:'Pre-matrícula N° '+esc(d.numRegistro)+' · '+esc(d.nombres+' '+d.apellidoPaterno),ancho:true,
     cuerpo:info+'<div class="resumen">'+htmlResumen(d,false)+'</div>',
@@ -732,7 +768,10 @@ function editarRegistro(n){
   const internos='<div class="seccion"><div class="seccion-tit"><h3>Datos internos del liceo</h3></div><div class="grid">'+
     '<div class="campo"><label for="e-letra">Letra del curso</label><select class="control" id="e-letra"><option value="">Sin letra</option>'+CFG.letras.map(l=>'<option'+(l===d.letra?' selected':'')+'>'+l+'</option>').join('')+'</select><span class="ayuda">Ej: 1° Medio <b>A</b>. El curso (1°, 2°…) se cambia más abajo.</span></div>'+
     '<div class="campo"><label for="e-estado">Estado</label><select class="control" id="e-estado">'+CFG.estados.map(e=>'<option'+(e===d.estado?' selected':'')+'>'+esc(e)+'</option>').join('')+'</select></div>'+
-    '<div class="campo"><label for="e-nroMatricula">N° de matrícula</label><input class="control" id="e-nroMatricula" maxlength="20" value="'+esc(d.nroMatricula)+'" placeholder="Se asigna al marcar Matriculado"><span class="ayuda">Se asigna solo (ej: '+CFG.anio+'-0001) al cambiar el estado a <b>Matriculado</b>. Puede corregirlo aquí.</span></div></div></div>';
+    '<div class="campo"><label for="e-nroMatricula">N° de matrícula</label><input class="control" id="e-nroMatricula" maxlength="20" value="'+esc(d.nroMatricula)+'" placeholder="Se asigna al marcar Matriculado"><span class="ayuda">Se asigna solo (ej: '+CFG.anio+'-0001) al cambiar el estado a <b>Matriculado</b>. Puede corregirlo aquí.</span></div>'+
+    '<div class="campo"><label for="e-aporteBoleta">Aporte voluntario · N° de boleta</label><input class="control" id="e-aporteBoleta" maxlength="20" value="'+esc(d.aporteBoleta)+'" placeholder="Ej: 10234"><span class="msg-error"></span></div>'+
+    '<div class="campo"><label for="e-aporteMonto">Aporte voluntario · Monto ($)</label><input class="control" id="e-aporteMonto" inputmode="numeric" maxlength="12" value="'+esc(d.aporteMonto)+'" placeholder="Ej: 25000"><span class="msg-error"></span><span class="ayuda">Solo números, sin puntos. Déjelo en blanco si no hubo aporte.</span></div>'+
+    '</div></div>';
   abrirModal({titulo:'Editar pre-matrícula N° '+esc(d.numRegistro),ancho:true,
     cuerpo:'<form id="form-editar" novalidate>'+internos+ESQUEMA.map(p=>p.secciones.map(s=>htmlSeccion(s,'e-')).join('')).join('')+'<div class="aviso err oculto" id="ed-err" style="margin-top:16px"></div></form>',
     pie:'<button class="btn btn-sec" onclick="cerrarModal()">Cancelar</button><button class="btn btn-pri" id="ed-ok"><span data-i="check"></span>Guardar cambios</button>'});
@@ -742,6 +781,7 @@ function editarRegistro(n){
     const e=FE.validar(CAMPOS.map(c=>c.key));
     if(e){const el=FE.el(e);el.scrollIntoView({behavior:'smooth',block:'center'});el.focus({preventScroll:true});toast('Revise los campos marcados.','err');return;}
     const datos=FE.datos();datos.estado=$('#e-estado').value;datos.nroMatricula=$('#e-nroMatricula').value.trim();datos.letra=$('#e-letra').value;
+    datos.aporteBoleta=$('#e-aporteBoleta').value.trim();datos.aporteMonto=$('#e-aporteMonto').value.replace(/[$.\s]/g,'').trim();
     cargando(true,'Guardando…');
     api('actualizarRegistro',S.token,n,datos).then(res=>{
       cargando(false);
@@ -895,6 +935,10 @@ const VISTA_INICIAL=(new URLSearchParams(location.search).get('p')||'').toLowerC
   if(/PEGUE_AQUI/.test(API_URL))toast('Falta configurar la URL de Apps Script en js/config.js','err');
   // "Despierta" Apps Script mientras la persona lee/llena (la primera llamada del día es la más lenta)
   api('ping').then(r=>{
+    if(r&&r.version!==CFG.version){
+      S.versionDistinta='Apps Script tiene la versión '+(r.version||'anterior a la 7')+' y el sitio la '+CFG.version+'. Reemplace los archivos de Apps Script y publique una nueva versión de la implementación; de lo contrario algunos datos no se guardarán.';
+      console.warn('[Pre-Matrícula] '+S.versionDistinta);avisoVersion();
+    }
     if(r&&r.formularioAbierto===false){CFG.formularioAbierto=false;$('#form-abierto').classList.add('oculto');$('#form-cerrado').classList.remove('oculto');}
   }).catch(()=>{});
   const t=store.get('pm_token',true);
