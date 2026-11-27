@@ -673,7 +673,7 @@ function pintarTabla(){
       '<td data-l="Curso" class="nw"><div>'+curso+'<div class="sub">Antes: '+esc(r.cursoGestionPasada)+'</div></div></td>'+
       '<td data-l="Especialidad">'+esc(r.especialidad)+'</td>'+
       '<td data-l="Apoderado"><div>'+esc(r.apoderado)+'<div class="sub">'+esc(r.fono)+'</div></div></td>'+
-      '<td data-l="Estado">'+estado+'</td><td data-l="Correo">'+mail+'</td>'+
+      '<td data-l="Estado"><div>'+estado+'<div style="margin-top:6px">'+badgeAporte(r)+'</div></div></td><td data-l="Correo">'+mail+'</td>'+
       '<td data-l="Acciones"><div class="acc">'+acc+'</div></td></tr>';
   }).join('');
   pintarIconos($('#tbody'));
@@ -691,6 +691,9 @@ function avisoVersion(){
   d.innerHTML='<span data-i="alerta"></span><div><b>Versiones distintas.</b> '+esc(S.versionDistinta)+'</div>';
   const w=p.querySelector('.panel-wrap')||p.firstElementChild;w.insertBefore(d,w.firstChild);pintarIconos(d);
 }
+/** Aporte voluntario (solo informativo): SÍ si tiene boleta o monto registrados. */
+function tieneAporte(r){return !!(r&&(String(r.aporteBoleta||'').trim()||String(r.aporteMonto||'').trim()));}
+function badgeAporte(r){return tieneAporte(r)?'<span class="badge b-si" title="Tiene aporte voluntario registrado">Aporte: SÍ</span>':'<span class="badge b-Retirado" title="Sin aporte voluntario registrado">Aporte: NO</span>';}
 function regLocal(n){return S.registros.filter(r=>r.numRegistro===String(n))[0];}
 
 // ---------- Selección múltiple ----------
@@ -754,7 +757,7 @@ function verRegistro(n){
   const d=regLocal(n);if(!d)return toast('Registro no encontrado. Actualice el panel.','err');
   const info='<div class="aviso info" style="margin-bottom:16px;flex-wrap:wrap"><span data-i="info"></span><div>Recibida el <b>'+esc(d.timestamp)+'</b> · Curso: <b>'+esc(cursoTexto(d))+'</b> · Estado: <span class="badge b-'+esc(d.estado)+'">'+esc(d.estado)+'</span>'+
     (d.nroMatricula?' · N° Matrícula: <b>'+esc(d.nroMatricula)+'</b>':'')+
-    (d.aporteBoleta||d.aporteMonto?' · Aporte voluntario: <b>'+(d.aporteMonto?'$'+Number(d.aporteMonto).toLocaleString('es-CL'):'')+(d.aporteBoleta?' (boleta N° '+esc(d.aporteBoleta)+')':'')+'</b>':'')+' · Correo: <b>'+esc(d.emailEnviado||'No')+'</b>'+
+    ' · Aporte voluntario: '+badgeAporte(d)+(tieneAporte(d)?' <b>'+(d.aporteMonto?'$'+Number(d.aporteMonto).toLocaleString('es-CL'):'')+(d.aporteBoleta?' (boleta N° '+esc(d.aporteBoleta)+')':'')+'</b>':'')+' · Correo: <b>'+esc(d.emailEnviado||'No')+'</b>'+
     (d.modificadoPor?'<br><span style="font-size:13px">Última modificación: '+esc(d.fechaModificacion)+' por '+esc(d.modificadoPor)+'</span>':'')+'</div></div>';
   abrirModal({titulo:'Pre-matrícula N° '+esc(d.numRegistro)+' · '+esc(d.nombres+' '+d.apellidoPaterno),ancho:true,
     cuerpo:info+'<div class="resumen">'+htmlResumen(d,false)+'</div>',
@@ -769,6 +772,7 @@ function editarRegistro(n){
     '<div class="campo"><label for="e-letra">Letra del curso</label><select class="control" id="e-letra"><option value="">Sin letra</option>'+CFG.letras.map(l=>'<option'+(l===d.letra?' selected':'')+'>'+l+'</option>').join('')+'</select><span class="ayuda">Ej: 1° Medio <b>A</b>. El curso (1°, 2°…) se cambia más abajo.</span></div>'+
     '<div class="campo"><label for="e-estado">Estado</label><select class="control" id="e-estado">'+CFG.estados.map(e=>'<option'+(e===d.estado?' selected':'')+'>'+esc(e)+'</option>').join('')+'</select></div>'+
     '<div class="campo"><label for="e-nroMatricula">N° de matrícula</label><input class="control" id="e-nroMatricula" maxlength="20" value="'+esc(d.nroMatricula)+'" placeholder="Se asigna al marcar Matriculado"><span class="ayuda">Se asigna solo (ej: '+CFG.anio+'-0001) al cambiar el estado a <b>Matriculado</b>. Puede corregirlo aquí.</span></div>'+
+    '<div class="campo"><label>Estado del aporte voluntario</label><div class="control" id="e-aporteEstado" style="display:flex;align-items:center;background:#f6f8fb">'+badgeAporte(d)+'</div><span class="ayuda">Informativo: cambia solo al ingresar boleta o monto.</span></div>'+
     '<div class="campo"><label for="e-aporteBoleta">Aporte voluntario · N° de boleta</label><input class="control" id="e-aporteBoleta" maxlength="20" value="'+esc(d.aporteBoleta)+'" placeholder="Ej: 10234"><span class="msg-error"></span></div>'+
     '<div class="campo"><label for="e-aporteMonto">Aporte voluntario · Monto ($)</label><input class="control" id="e-aporteMonto" inputmode="numeric" maxlength="12" value="'+esc(d.aporteMonto)+'" placeholder="Ej: 25000"><span class="msg-error"></span><span class="ayuda">Solo números, sin puntos. Déjelo en blanco si no hubo aporte.</span></div>'+
     '</div></div>';
@@ -776,6 +780,8 @@ function editarRegistro(n){
     cuerpo:'<form id="form-editar" novalidate>'+internos+ESQUEMA.map(p=>p.secciones.map(s=>htmlSeccion(s,'e-')).join('')).join('')+'<div class="aviso err oculto" id="ed-err" style="margin-top:16px"></div></form>',
     pie:'<button class="btn btn-sec" onclick="cerrarModal()">Cancelar</button><button class="btn btn-pri" id="ed-ok"><span data-i="check"></span>Guardar cambios</button>'});
   const FE=new Formulario($('#form-editar'),'e-');
+  const actAporte=()=>{$('#e-aporteEstado').innerHTML=badgeAporte({aporteBoleta:$('#e-aporteBoleta').value,aporteMonto:$('#e-aporteMonto').value});};
+  $('#e-aporteBoleta').addEventListener('input',actAporte);$('#e-aporteMonto').addEventListener('input',actAporte);
   FE.cargar(d);FE.el('fechaMatricula').readOnly=true;
   $('#ed-ok').onclick=()=>{
     const e=FE.validar(CAMPOS.map(c=>c.key));
